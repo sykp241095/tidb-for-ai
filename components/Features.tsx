@@ -442,7 +442,7 @@ export default function Features() {
                   </span>
                 </div>
                 <button
-                  onClick={() => copyToClipboard(additionalFeatures[0].code)}
+                  onClick={() => copyToClipboard(additionalFeatures[0].code || '')}
                   className="flex items-center gap-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors text-sm"
                 >
                   {copiedCode === additionalFeatures[0].code ? (
@@ -463,7 +463,7 @@ export default function Features() {
               <div className="p-6 overflow-x-auto">
                 <pre className="text-sm text-gray-100 leading-relaxed">
                   <code>
-                    {additionalFeatures[0].code.split('\n').map((line, index) => (
+                    {(additionalFeatures[0].code || '').split('\n').map((line, index) => (
                       <div key={index} className="text-gray-100">
                         {line}
                       </div>
