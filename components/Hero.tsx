@@ -1,27 +1,35 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { ArrowRight, Database, Search, Zap, Copy, Check, BookOpen } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { ArrowRight, Copy, Check, BookOpen } from 'lucide-react'
+import { useClipboard } from '@/hooks'
+import { Button, Section } from '@/components/ui'
 
-export default function Hero() {
+const Hero = React.memo(() => {
   const [mounted, setMounted] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const { copied, copyToClipboard } = useClipboard()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText('pip install pytidb')
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('Failed to copy:', err)
-    }
-  }
+  const handleCopy = useCallback(() => {
+    copyToClipboard('pip install pytidb')
+  }, [copyToClipboard])
 
-  if (!mounted) return null
+  if (!mounted) {
+    return (
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-black dark:to-gray-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-8"></div>
+            <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-6"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-12"></div>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-black dark:to-gray-950">
@@ -59,7 +67,7 @@ export default function Hero() {
                   </span>
                 </div>
                 <button
-                  onClick={copyToClipboard}
+                  onClick={handleCopy}
                   className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white rounded-lg transition-all duration-200 text-sm"
                 >
                   {copied ? (
@@ -80,14 +88,23 @@ export default function Hero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <a href="https://tidbcloud.com/" className="group bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 font-semibold text-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+            <Button
+              href="https://tidbcloud.com/"
+              variant="primary"
+              size="lg"
+              icon={<ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
+              className="group shadow-lg hover:shadow-xl"
+            >
               Explore in Product
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </a>
-            <button className="border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white px-8 py-4 rounded-xl hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 font-semibold text-lg flex items-center justify-center gap-2">
-              <BookOpen size={20} />
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              icon={<BookOpen size={20} />}
+              iconPosition="left"
+            >
               View Documentation
-            </button>
+            </Button>
           </div>
 
 
@@ -111,4 +128,8 @@ export default function Hero() {
       </div>
     </section>
   )
-}
+})
+
+Hero.displayName = 'Hero'
+
+export default Hero

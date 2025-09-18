@@ -9,6 +9,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://tidbcloud.com'),
   title: 'TiDB - AI-Native Database for Modern Developers',
   description: 'TiDB combines vector database, full-text search, and MySQL compatibility in one unified platform for AI developers.',
   keywords: 'TiDB, vector database, full-text search, MySQL, AI database, distributed database',
@@ -20,14 +21,19 @@ export const metadata: Metadata = {
     description: 'TiDB combines vector database, full-text search, and MySQL compatibility in one unified platform for AI developers.',
     type: 'website',
     locale: 'en_US',
+    siteName: 'TiDB AI',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TiDB - AI-Native Database for Modern Developers',
     description: 'TiDB combines vector database, full-text search, and MySQL compatibility in one unified platform for AI developers.',
   },
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({

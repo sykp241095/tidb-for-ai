@@ -189,7 +189,7 @@ export default function CodeExamples() {
       setCopiedCode(code)
       setTimeout(() => setCopiedCode(''), 2000)
     } catch (err) {
-      console.error('Failed to copy code:', err)
+      // Silent failure for better UX
     }
   }
 

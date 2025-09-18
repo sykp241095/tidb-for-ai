@@ -1,21 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
+import { useScrollEffect } from '@/hooks'
+import { navigationItems } from '@/data'
+import { Button } from '@/components/ui'
 
-export default function Navigation() {
+const Navigation = React.memo(() => {
   const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const scrolled = useScrollEffect(50)
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -33,24 +27,19 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="flex items-center space-x-8">
-              <a href="/#features" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Features
-              </a>
-              <a href="/#use-cases" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Use Cases
-              </a>
-              <a href="/gallery" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Gallery
-              </a>
-              <a href="/blogs" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Blog
-              </a>
-              <a href="https://pingcap.github.io/ai/" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Docs
-              </a>
-              <button className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium">
+              {navigationItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  {...(item.external && { target: '_blank', rel: 'noopener noreferrer' })}
+                >
+                  {item.label}
+                </a>
+              ))}
+              <Button variant="primary" size="sm">
                 Get Started
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -58,7 +47,10 @@ export default function Navigation() {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -67,30 +59,31 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden">
+          <div className="md:hidden" id="mobile-menu">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-200/20 dark:border-gray-800/20">
-              <a href="/#features" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Features
-              </a>
-              <a href="/#use-cases" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Use Cases
-              </a>
-              <a href="/gallery" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Gallery
-              </a>
-              <a href="/blogs" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Blog
-              </a>
-              <a href="https://pingcap.github.io/ai/" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Docs
-              </a>
-              <button className="w-full mt-4 bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium">
-                Get Started
-              </button>
+              {navigationItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  {...(item.external && { target: '_blank', rel: 'noopener noreferrer' })}
+                >
+                  {item.label}
+                </a>
+              ))}
+              <div className="mt-4">
+                <Button variant="primary" size="md" fullWidth>
+                  Get Started
+                </Button>
+              </div>
             </div>
           </div>
         )}
       </div>
     </nav>
   )
-}
+})
+
+Navigation.displayName = 'Navigation'
+
+export default Navigation

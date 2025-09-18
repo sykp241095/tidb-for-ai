@@ -1,9 +1,10 @@
 'use client'
 
-import { Github, Twitter, Linkedin, MessageCircle } from 'lucide-react'
+import React from 'react'
 import Image from 'next/image'
+import { footerSections, socialLinks, legalLinks } from '@/data'
 
-export default function Footer() {
+const Footer = React.memo(() => {
   return (
     <footer className="bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -19,56 +20,41 @@ export default function Footer() {
               and MySQL compatibility in one unified platform.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                <Github size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                <Linkedin size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                <MessageCircle size={20} />
-              </a>
+              {socialLinks.map((social) => {
+                const Icon = social.icon
+                return (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    aria-label={social.label}
+                  >
+                    <Icon size={20} />
+                  </a>
+                )
+              })}
             </div>
           </div>
 
-          {/* Product */}
-          <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Product</h4>
-            <ul className="space-y-3">
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">TiDB Cloud</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Vector Search</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Full-Text Search</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">MySQL Compatibility</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a></li>
-            </ul>
-          </div>
-
-          {/* Developers */}
-          <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Developers</h4>
-            <ul className="space-y-3">
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">API Reference</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Examples Gallery</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Tutorials</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Community</a></li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Company</h4>
-            <ul className="space-y-3">
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">About</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Careers</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Contact</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Press</a></li>
-            </ul>
-          </div>
+          {/* Footer Sections */}
+          {footerSections.map((section) => (
+            <div key={section.title}>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-4">{section.title}</h4>
+              <ul className="space-y-3">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                      {...(link.external && { target: '_blank', rel: 'noopener noreferrer' })}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
         {/* Bottom */}
@@ -79,9 +65,15 @@ export default function Footer() {
                 &copy; 2024 PingCAP. All rights reserved.
               </p>
               <div className="flex space-x-6 text-sm">
-                <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Privacy Policy</a>
-                <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Terms of Service</a>
-                <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Cookie Policy</a>
+                {legalLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -99,4 +91,8 @@ export default function Footer() {
       </div>
     </footer>
   )
-}
+})
+
+Footer.displayName = 'Footer'
+
+export default Footer
