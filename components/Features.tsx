@@ -15,53 +15,30 @@ const features = [
       'OpenAI embeddings integration'
     ],
     color: 'from-blue-500 to-blue-600',
-    code: `# Semantic search with RAG context retrieval
+    code: `# Semantic search with RAG
 import tidb_vector as tv
 from openai import OpenAI
 
-# Connect to TiDB
 client = tv.connect("mysql://user:pass@host:4000/db")
 openai_client = OpenAI()
 
-# Create knowledge base table
-client.execute("""
-    CREATE TABLE IF NOT EXISTS knowledge_base (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        content TEXT,
-        title VARCHAR(500),
-        source VARCHAR(200),
-        embedding VECTOR(1536) COMMENT 'hnsw(distance=cosine)',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-""")
-
-# Function to get embeddings
-def get_embedding(text):
-    response = openai_client.embeddings.create(
-        model="text-embedding-3-small",
-        input=text
-    )
-    return response.data[0].embedding
-
-# RAG query function
+# Get embeddings and search
 def semantic_search(query, top_k=5):
-    query_embedding = get_embedding(query)
+    query_embedding = openai_client.embeddings.create(
+        model="text-embedding-3-small", input=query
+    ).data[0].embedding
 
-    results = client.execute("""
-        SELECT
-            content, title, source,
-            VEC_COSINE_DISTANCE(embedding, %s) as similarity
+    return client.execute("""
+        SELECT content, title,
+               VEC_COSINE_DISTANCE(embedding, %s) as similarity
         FROM knowledge_base
-        ORDER BY similarity DESC
-        LIMIT %s
+        ORDER BY similarity DESC LIMIT %s
     """, (query_embedding, top_k))
 
-    return results
-
 # Example usage
-contexts = semantic_search("How to optimize database performance?")
-for content, title, source, similarity in contexts:
-    print(f"Title: {title} (similarity: {similarity:.4f})")`
+results = semantic_search("How to optimize performance?")
+for content, title, similarity in results:
+    print(f"{title}: {similarity:.3f}")`
   },
   {
     icon: Image,
@@ -74,59 +51,33 @@ for content, title, source, similarity in contexts:
       'Visual content understanding'
     ],
     color: 'from-green-500 to-green-600',
-    code: `# Multimodal Image & Text Search with CLIP
+    code: `# Multimodal search with CLIP
 import tidb_vector as tv
 import clip
 import torch
-from PIL import Image
-import requests
-from io import BytesIO
 
-# Load CLIP model
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
-
-# Connect to TiDB
+# Load CLIP model and connect to TiDB
+model, preprocess = clip.load("ViT-B/32")
 client = tv.connect("mysql://user:pass@host:4000/db")
 
-# Create multimodal content table
-client.execute("""
-    CREATE TABLE IF NOT EXISTS multimodal_content (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        content_type ENUM('image', 'text'),
-        content_path VARCHAR(500),
-        content_text TEXT,
-        description TEXT,
-        clip_embedding VECTOR(512) COMMENT 'hnsw(distance=cosine)',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-""")
-
-def get_clip_embedding(content, content_type='text'):
-    """Generate CLIP embeddings for text or image"""
+def multimodal_search(query, limit=5):
+    # Get CLIP embedding for text query
     with torch.no_grad():
-        if content_type == 'text':
-            text_tokens = clip.tokenize([content]).to(device)
-            text_features = model.encode_text(text_tokens)
-            return text_features.cpu().numpy()[0].tolist()
-        else:
-            if isinstance(content, str):
-                if content.startswith('http'):
-                    response = requests.get(content)
-                    image = Image.open(BytesIO(response.content))
-                else:
-                    image = Image.open(content)
-            else:
-                image = content
+        text_tokens = clip.tokenize([query])
+        query_embedding = model.encode_text(text_tokens)[0].tolist()
 
-            image_input = preprocess(image).unsqueeze(0).to(device)
-            image_features = model.encode_image(image_input)
-            return image_features.cpu().numpy()[0].tolist()
+    # Search across images and text
+    return client.execute("""
+        SELECT content_type, description,
+               VEC_COSINE_DISTANCE(clip_embedding, %s) as similarity
+        FROM multimodal_content
+        ORDER BY similarity ASC LIMIT %s
+    """, (query_embedding, limit))
 
-# Search across both images and text
-results = multimodal_search("mountain landscape", limit=5)
-for content_type, content, description, similarity in results:
-    print(f"Type: {content_type}, Similarity: {similarity:.4f}")`
+# Example usage
+results = multimodal_search("mountain landscape")
+for content_type, desc, similarity in results:
+    print(f"{content_type}: {similarity:.3f}")`
   },
   {
     icon: Layers,
@@ -139,68 +90,34 @@ for content_type, content, description, similarity in results:
       'Multi-criteria relevance ranking'
     ],
     color: 'from-purple-500 to-purple-600',
-    code: `# Advanced Hybrid Search Implementation
+    code: `# Hybrid search combining vector + full-text
 import tidb_vector as tv
 from openai import OpenAI
 
 client = tv.connect("mysql://user:pass@host:4000/db")
 openai_client = OpenAI()
 
-# Create comprehensive search table
-client.execute("""
-    CREATE TABLE IF NOT EXISTS hybrid_documents (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(500),
-        content TEXT,
-        category VARCHAR(100),
-        author VARCHAR(200),
-        publish_date DATE,
-        view_count INT DEFAULT 0,
-        rating FLOAT DEFAULT 0.0,
-        embedding VECTOR(1536) COMMENT 'hnsw(distance=cosine)',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FULLTEXT(title, content)
-    )
-""")
+def hybrid_search(query, limit=10):
+    # Get vector embedding
+    query_embedding = openai_client.embeddings.create(
+        model="text-embedding-3-small", input=query
+    ).data[0].embedding
 
-def hybrid_search(query, weights=None, limit=10):
-    """Advanced hybrid search combining multiple signals"""
-    if weights is None:
-        weights = {'vector': 0.4, 'fulltext': 0.3, 'popularity': 0.2, 'recency': 0.1}
-
-    # Get query embedding
-    response = openai_client.embeddings.create(
-        model="text-embedding-3-small",
-        input=query
-    )
-    query_embedding = response.data[0].embedding
-
-    # Hybrid scoring query
-    results = client.execute("""
-        SELECT
-            id, title, content, category, rating,
-            -- Combined weighted score
-            (
-                (1 - VEC_COSINE_DISTANCE(embedding, %s)) * %s +
-                MATCH(title, content) AGAINST (%s IN NATURAL LANGUAGE MODE) * %s +
-                LEAST(view_count / 1000.0, 1.0) * %s +
-                GREATEST(0, 1 - DATEDIFF(CURDATE(), publish_date) / 365.0) * %s
-            ) as combined_score
+    # Combined vector + full-text search
+    return client.execute("""
+        SELECT title, content,
+               (1 - VEC_COSINE_DISTANCE(embedding, %s)) * 0.7 +
+               MATCH(title, content) AGAINST (%s) * 0.3 as score
         FROM hybrid_documents
         WHERE VEC_COSINE_DISTANCE(embedding, %s) < 0.8
-           OR MATCH(title, content) AGAINST (%s IN NATURAL LANGUAGE MODE) > 0
-        ORDER BY combined_score DESC
-        LIMIT %s
-    """, (query_embedding, weights['vector'], query, weights['fulltext'],
-           weights['popularity'], weights['recency'], query_embedding, query, limit))
-
-    return results
+           OR MATCH(title, content) AGAINST (%s) > 0
+        ORDER BY score DESC LIMIT %s
+    """, (query_embedding, query, query_embedding, query, limit))
 
 # Example usage
-results = hybrid_search("machine learning algorithms", limit=5)
-for row in results:
-    title, score = row[1], row[-1]
-    print(f"Result: {title}, Score: {score:.3f}")`
+results = hybrid_search("machine learning algorithms")
+for title, content, score in results:
+    print(f"{title}: {score:.3f}")`
   },
   {
     icon: Filter,
@@ -213,95 +130,43 @@ for row in results:
       'Performance-optimized queries'
     ],
     color: 'from-orange-500 to-orange-600',
-    code: `# Enhanced Filtering with Vector Search
+    code: `# Enhanced filtering with semantic search
 import tidb_vector as tv
-from datetime import datetime, timedelta
+from openai import OpenAI
 
 client = tv.connect("mysql://user:pass@host:4000/db")
+openai_client = OpenAI()
 
-# Create comprehensive product catalog
-client.execute("""
-    CREATE TABLE IF NOT EXISTS products (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(200),
-        description TEXT,
-        category VARCHAR(100),
-        brand VARCHAR(100),
-        price DECIMAL(10,2),
-        rating FLOAT,
-        review_count INT,
-        tags JSON,
-        attributes JSON,
-        stock_quantity INT,
-        is_featured BOOLEAN DEFAULT FALSE,
-        description_embedding VECTOR(1536) COMMENT 'hnsw(distance=cosine)',
-        INDEX idx_category (category),
-        INDEX idx_price (price)
-    )
-""")
+def search_products(query, filters=None, limit=10):
+    # Get semantic embedding
+    query_embedding = openai_client.embeddings.create(
+        model="text-embedding-3-small", input=query
+    ).data[0].embedding
 
-class AdvancedFilter:
-    def __init__(self, client):
-        self.client = client
+    # Build filtered query
+    conditions = ["VEC_COSINE_DISTANCE(description_embedding, %s) < 0.7"]
+    params = [query_embedding]
 
-    def search_products(self, semantic_query=None, filters=None, limit=20):
-        """Execute filtered product search"""
-        conditions = []
-        params = []
+    if filters:
+        if 'price_min' in filters:
+            conditions.append("price >= %s")
+            params.append(filters['price_min'])
+        if 'category' in filters:
+            conditions.append("category = %s")
+            params.append(filters['category'])
 
-        # Base query
-        query = "SELECT id, name, category, brand, price, rating FROM products"
+    return client.execute(f"""
+        SELECT name, price, rating,
+               VEC_COSINE_DISTANCE(description_embedding, %s) as similarity
+        FROM products
+        WHERE {' AND '.join(conditions)}
+        ORDER BY similarity ASC LIMIT %s
+    """, [query_embedding] + params + [limit])
 
-        if semantic_query:
-            # Add semantic similarity
-            from openai import OpenAI
-            openai_client = OpenAI()
-            response = openai_client.embeddings.create(
-                model="text-embedding-3-small",
-                input=semantic_query
-            )
-            query_embedding = response.data[0].embedding
-
-            query = "SELECT id, name, category, brand, price, rating, VEC_COSINE_DISTANCE(description_embedding, %s) as similarity FROM products"
-            params.append(query_embedding)
-            conditions.append("VEC_COSINE_DISTANCE(description_embedding, %s) < 0.7")
-            params.append(query_embedding)
-
-        if filters:
-            if 'price_min' in filters:
-                conditions.append("price >= %s")
-                params.append(filters['price_min'])
-            if 'categories' in filters:
-                placeholders = ','.join(['%s'] * len(filters['categories']))
-                conditions.append(f"category IN ({placeholders})")
-                params.extend(filters['categories'])
-            if 'min_rating' in filters:
-                conditions.append("rating >= %s")
-                params.append(filters['min_rating'])
-            if filters.get('in_stock_only', False):
-                conditions.append("stock_quantity > 0")
-
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
-
-        if semantic_query:
-            query += " ORDER BY similarity ASC"
-
-        query += f" LIMIT {limit}"
-
-        return self.client.execute(query, params)
-
-# Usage example
-filter_engine = AdvancedFilter(client)
-results = filter_engine.search_products(
-    semantic_query="comfortable running shoes",
-    filters={'price_min': 50.0, 'categories': ['shoes'], 'min_rating': 4.0},
-    limit=10
-)
-
-for row in results:
-    name, price, rating = row[1], row[4], row[5]
-    print(f"{name} - Price: {price} - Rating: {rating}")`
+# Example usage
+results = search_products("running shoes", {'price_min': 50})
+for name, price, rating, similarity in results:
+    print(f"{name}: {price} ({similarity:.3f})")`
   },
   {
     icon: Sparkles,
@@ -314,74 +179,43 @@ for row in results:
       'Zero-maintenance vector search'
     ],
     color: 'from-pink-500 to-pink-600',
-    code: `# Auto Embedding with TiDB Built-in Functions
+    code: `# Auto-embedding with TiDB built-in functions
 import tidb_vector as tv
 
 client = tv.connect("mysql://user:pass@host:4000/db")
 
-# Create table with auto-embedding support
+# Create table with auto-generated embeddings
 client.execute("""
-    CREATE TABLE IF NOT EXISTS auto_embedded_content (
+    CREATE TABLE auto_embedded_content (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(500),
         content TEXT,
-        category VARCHAR(100),
-        -- Auto-generated embedding using built-in function
+        -- Auto-generated embedding column
         content_embedding VECTOR(1536)
             GENERATED ALWAYS AS (VEC_FROM_TEXT(CONCAT(title, ' ', content)))
-            STORED COMMENT 'hnsw(distance=cosine)',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FULLTEXT(title, content)
+            STORED COMMENT 'hnsw(distance=cosine)'
     )
 """)
 
-# Alternative with triggers for more control
+# Insert content - embeddings generated automatically
 client.execute("""
-    CREATE TABLE IF NOT EXISTS smart_documents (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(500),
-        content TEXT,
-        summary TEXT,
-        category VARCHAR(100),
-        auto_embedding VECTOR(1536) COMMENT 'hnsw(distance=cosine)',
-        title_embedding VECTOR(1536) COMMENT 'hnsw(distance=cosine)',
-        embedding_updated_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-""")
-
-def insert_content_with_auto_embedding(title, content, category):
-    """Insert content and let TiDB automatically generate embeddings"""
-    client.execute("""
-        INSERT INTO auto_embedded_content (title, content, category)
-        VALUES (%s, %s, %s)
-    """, (title, content, category))
-    print("Inserted content with auto-generated embeddings")
-
-def search_auto_embedded_content(query, limit=10):
-    """Search using auto-generated embeddings"""
-    results = client.execute("""
-        SELECT
-            title, content, category,
-            VEC_COSINE_DISTANCE(auto_embedding, VEC_FROM_TEXT(%s)) as similarity
-        FROM smart_documents
-        ORDER BY similarity ASC
-        LIMIT %s
-    """, (query, limit))
-
-    return results
-
-# Example usage - embeddings generated automatically
-insert_content_with_auto_embedding(
-    "Introduction to Vector Databases",
-    "Vector databases enable semantic search and AI applications.",
-    "Technology"
-)
+    INSERT INTO auto_embedded_content (title, content)
+    VALUES (%s, %s)
+""", ("Vector Database Guide", "Learn about vector search"))
 
 # Search using auto-generated embeddings
-results = search_auto_embedded_content("semantic search applications", limit=5)
-for title, content, category, similarity in results:
-    print(f"Title: {title}, Similarity: {similarity:.4f}")`
+def auto_search(query, limit=5):
+    return client.execute("""
+        SELECT title, content,
+               VEC_COSINE_DISTANCE(content_embedding, VEC_FROM_TEXT(%s)) as similarity
+        FROM auto_embedded_content
+        ORDER BY similarity ASC LIMIT %s
+    """, (query, limit))
+
+# Example usage
+results = auto_search("vector search tutorial")
+for title, content, similarity in results:
+    print(f"{title}: {similarity:.3f}")`
   }
 ]
 
@@ -444,25 +278,57 @@ export default function Features() {
                 <div
                   key={index}
                   onClick={() => setActiveFeature(index)}
-                  className={`p-6 rounded-2xl border transition-all duration-300 cursor-pointer ${
+                  className={`relative p-6 rounded-2xl border transition-all duration-300 cursor-pointer bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-900 ${
                     activeFeature === index
-                      ? 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 shadow-lg'
-                      : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900'
+                      ? 'border-blue-500/50 dark:border-blue-400/50 shadow-lg shadow-blue-500/10 dark:shadow-blue-400/10'
+                      : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
                   }`}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl bg-gradient-to-r ${feature.color} text-white shrink-0`}>
-                      <Icon size={24} />
+                  {/* Terminal-style header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex gap-1.5">
+                        <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                        <div className="w-2.5 h-2.5 bg-yellow-500 rounded-full"></div>
+                        <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+                      </div>
+                      <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+                        {feature.title.toLowerCase().replace(/ /g, '_').replace(/&/g, 'and')}.py
+                      </span>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        {feature.description}
-                      </p>
+                    <div className={`p-2 rounded-lg bg-gradient-to-r ${feature.color} text-white`}>
+                      <Icon size={16} />
                     </div>
                   </div>
+
+                  {/* Content */}
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white font-mono">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                      {feature.description}
+                    </p>
+
+                    {/* Tech tags */}
+                    <div className="flex flex-wrap gap-1.5 pt-2">
+                      {feature.details.slice(0, 2).map((detail, detailIndex) => (
+                        <span
+                          key={detailIndex}
+                          className="px-2 py-1 bg-gray-200/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 rounded text-xs font-mono"
+                        >
+                          {detail}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Active indicator */}
+                  {activeFeature === index && (
+                    <div className="absolute top-3 right-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -513,35 +379,6 @@ export default function Features() {
               </pre>
             </div>
 
-            {/* Feature Details */}
-            <div className="px-6 pb-6">
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className={`p-2 rounded-lg bg-gradient-to-r ${features[activeFeature].color} text-white shrink-0`}>
-                    {(() => {
-                      const Icon = features[activeFeature].icon
-                      return <Icon size={20} />
-                    })()}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white mb-1">
-                      {features[activeFeature].title}
-                    </h3>
-                    <p className="text-gray-300 text-sm">
-                      {features[activeFeature].description}
-                    </p>
-                  </div>
-                </div>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {features[activeFeature].details.map((detail, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full shrink-0"></div>
-                      <span className="text-gray-400 text-sm">{detail}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
 

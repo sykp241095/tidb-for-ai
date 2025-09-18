@@ -88,59 +88,6 @@ export default function UseCases() {
   return (
     <section id="use-cases" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-black dark:to-gray-950">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Powerful AI Use Cases
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            From simple semantic search to complex AI agents, TiDB powers
-            the next generation of intelligent applications.
-          </p>
-        </div>
-
-        {/* Use Cases Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {useCases.map((useCase, index) => (
-            <div
-              key={index}
-              className={`bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 hover:shadow-xl group ${
-                useCase.featured ? 'ring-2 ring-blue-500/20 lg:col-span-2' : ''
-              }`}
-            >
-              <div className="flex items-start justify-between mb-6">
-                <div className="text-3xl mb-4">{useCase.icon}</div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${useCase.tierColor}`}>
-                  {useCase.tier}
-                </span>
-              </div>
-
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                {useCase.title}
-              </h3>
-
-              <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                {useCase.description}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {useCase.tags.map((tag, tagIndex) => (
-                  <span
-                    key={tagIndex}
-                    className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <button className="inline-flex items-center gap-2 text-black dark:text-white font-medium hover:gap-3 transition-all duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                {useCase.cta}
-                <ArrowRight size={16} />
-              </button>
-            </div>
-          ))}
-        </div>
 
         {/* Customer Stories Section */}
         <div className="mb-16">
@@ -153,26 +100,26 @@ export default function UseCases() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-10">
             {customerStories.map((story, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 hover:shadow-xl group"
+                className="bg-white dark:bg-gray-900 rounded-3xl p-10 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 hover:shadow-xl group"
               >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="text-3xl">{story.logo}</div>
+                <div className="flex items-center gap-5 mb-8">
+                  <div className="text-4xl">{story.logo}</div>
                   <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">{story.company}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{story.title}</p>
+                    <h4 className="text-xl font-bold text-gray-900 dark:text-white">{story.company}</h4>
+                    <p className="text-base text-gray-600 dark:text-gray-400">{story.title}</p>
                   </div>
                 </div>
 
-                <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+                <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
                   {story.description}
                 </p>
 
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-lg p-4">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-xl p-6">
+                  <p className="text-base font-medium text-gray-900 dark:text-white">
                     {story.impact}
                   </p>
                 </div>
