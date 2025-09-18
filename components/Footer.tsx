@@ -1,6 +1,7 @@
 'use client'
 
 import { Github, Twitter, Linkedin, MessageCircle } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Footer() {
   return (
@@ -10,10 +11,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">Ti</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">TiDB</span>
+              <Image src="/tidb-logo.png" alt="TiDB Logo" width={32} height={32} className="w-8 h-8" />
+              <span className="text-xl font-bold text-gray-900 dark:text-white">TiDBCloud for AI</span>
             </div>
             <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed max-w-md">
               The AI-native database that combines vector search, full-text search,

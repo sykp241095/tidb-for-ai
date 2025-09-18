@@ -27,7 +27,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           <a href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <Image src="/tidb-logo.png" alt="TiDB Logo" width={32} height={32} className="w-8 h-8" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">TiDB</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">TiDBCloud for AI</span>
           </a>
 
           {/* Desktop Navigation */}
@@ -41,6 +41,9 @@ export default function Navigation() {
               </a>
               <a href="/gallery" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Gallery
+              </a>
+              <a href="/blogs" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                Blog
               </a>
               <a href="https://pingcap.github.io/ai/" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Docs
@@ -74,6 +77,9 @@ export default function Navigation() {
               </a>
               <a href="/gallery" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 Gallery
+              </a>
+              <a href="/blogs" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                Blog
               </a>
               <a href="https://pingcap.github.io/ai/" className="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 Docs
