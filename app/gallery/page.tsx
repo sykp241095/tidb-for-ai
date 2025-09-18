@@ -198,7 +198,7 @@ export default function Gallery() {
             Application <span className="gradient-text">Gallery</span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Discover amazing applications built by our users with TiDB's multi-modal AI-native data platform.
+            Discover amazing applications built by our users with TiDB&apos;s multi-modal AI-native data platform.
             From AI agents to real-time analytics, see what the community has created.
           </p>
         </div>
@@ -305,7 +305,7 @@ export default function Gallery() {
             Ready to Build Your Own?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of developers building intelligent applications with TiDB's
+            Join thousands of developers building intelligent applications with TiDB&apos;s
             multi-modal AI-native data platform.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

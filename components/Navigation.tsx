@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -25,7 +26,7 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <a href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <img src="/tidb-logo.png" alt="TiDB Logo" className="w-8 h-8" />
+            <Image src="/tidb-logo.png" alt="TiDB Logo" width={32} height={32} className="w-8 h-8" />
             <span className="text-xl font-bold text-gray-900 dark:text-white">TiDB</span>
           </a>
 
