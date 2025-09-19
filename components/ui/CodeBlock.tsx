@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { CodeBlockProps } from '@/types'
-import Prism from 'prismjs'
-import 'prismjs/components/prism-python'
-import 'prismjs/themes/prism-tomorrow.css'
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { tomorrow } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import python from 'react-syntax-highlighter/dist/cjs/languages/prism/python'
+
+// Register the python language
+SyntaxHighlighter.registerLanguage('python', python)
 
 const CodeBlock: React.FC<CodeBlockProps> = ({
   code,
@@ -13,13 +16,11 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   copied = false
 }) => {
   const displayFilename = filename || `example.${language}`
+  const [selectedLine, setSelectedLine] = useState<number | null>(null)
 
-  useEffect(() => {
-    Prism.highlightAll()
-  }, [code])
-
-  const languageObj = Prism.languages[language] || Prism.languages.python
-  const highlightedCode = Prism.highlight(code, languageObj, language)
+  const handleLineClick = (lineNumber: number) => {
+    setSelectedLine(selectedLine === lineNumber ? null : lineNumber)
+  }
 
   return (
     <div className="relative bg-gray-900 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-700 dark:border-gray-600 group">
@@ -55,13 +56,42 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
       </div>
 
       {/* Code Content */}
-      <div className="p-4 overflow-x-auto">
-        <pre className="text-sm leading-relaxed font-mono bg-transparent">
-          <code
-            className={`language-${language}`}
-            dangerouslySetInnerHTML={{ __html: highlightedCode }}
-          />
-        </pre>
+      <div className="overflow-x-auto">
+        <SyntaxHighlighter
+          language={language}
+          style={tomorrow}
+          showLineNumbers={true}
+          lineNumberStyle={{
+            minWidth: '2.5rem',
+            paddingRight: '1rem',
+            textAlign: 'right',
+            color: '#6b7280',
+            backgroundColor: 'transparent',
+            userSelect: 'none'
+          }}
+          customStyle={{
+            margin: 0,
+            padding: '1rem',
+            backgroundColor: 'transparent',
+            fontSize: '0.875rem',
+            lineHeight: '1.5'
+          }}
+          codeTagProps={{
+            style: {
+              backgroundColor: 'transparent'
+            }
+          }}
+          lineProps={(lineNumber) => ({
+            style: {
+              backgroundColor: selectedLine === lineNumber ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease'
+            },
+            onClick: () => handleLineClick(lineNumber)
+          })}
+        >
+          {code}
+        </SyntaxHighlighter>
       </div>
     </div>
   )

@@ -13,26 +13,30 @@ export const features: Feature[] = [
       'OpenAI embeddings integration'
     ],
     color: 'from-blue-500 to-blue-600',
-    code: `# Define schema with auto-embedding
+    code: `# Define table schema
 class Chunk(TableModel):
+    __tablename__ = "chunks"
+    __table_args__ = {"extend_existing": True}
+
     id: int = Field(primary_key=True)
     text: str = Field()
     text_vec: list[float] = text_embed.VectorField(
-        source_field="text"
+        source_field="text",
     )
+    meta: dict = Field(sa_type=JSON)
 
 # Vector search with filtering
-def semantic_search(query_text):
-    return (
-        table.search(query_text)
-        .filter({"meta.language": "en"})
-        .distance_threshold(0.8)
-        .limit(5)
-        .to_pandas()
-    )
+df = (
+    table.search(query_text)
+    .filter({"meta.language": language})
+    .distance_threshold(distance_threshold)
+    .debug(True)
+    .limit(query_limit)
+    .to_pandas()
+)
 
 # Example usage
-results = semantic_search("slow application performance")
+results = table.search("slow application performance")
 print(f"Found {len(results)} similar results")`
   },
   {
