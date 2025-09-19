@@ -48,7 +48,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ post, relatedPosts }) => {
 
       <main>
         {/* Header */}
-        <Section background="gradient" padding="lg" className="pt-32">
+        <Section background="gradient" padding="md" className="pt-32">
           <div className="max-w-4xl mx-auto">
             {/* Back button */}
             <div className="mb-8">

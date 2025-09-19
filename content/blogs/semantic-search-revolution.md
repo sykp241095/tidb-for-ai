@@ -16,6 +16,11 @@ Semantic search uses mathematical representations called embeddings to understan
 
 For example, searching for "slow application" can find documents about "performance optimization" and "database tuning" because they're semantically related. This makes search much more intuitive and powerful.
 
+<p align="center">
+  <img width="700" alt="Semantic search with vector embeddings" src="https://github.com/user-attachments/assets/6d7783a5-ce9c-4dcc-8b95-49d5f0ca735a" />
+  <p align="center"><i>Semantic search with vector embeddings</i></p>
+</p>
+
 ## How to Solve These Search Limitations
 
 To solve these search limitations, you need a vector database that can handle semantic understanding. TiDB is one such solution - a distributed, MySQL-compatible database that combines multiple data capabilities in one platform:
@@ -26,11 +31,6 @@ To solve these search limitations, you need a vector database that can handle se
 - **Multi-Modal Storage**: Handle structured data, vectors, and text in a single database
 
 This example demonstrates how to build a semantic search application using TiDB's vector capabilities and local embedding models. It leverages vector search to find similar items based on meaning, not just keywords. The app uses Streamlit for the web UI and Ollama for local embedding generation.
-
-<p align="center">
-  <img width="700" alt="Semantic search with vector embeddings" src="https://github.com/user-attachments/assets/6d7783a5-ce9c-4dcc-8b95-49d5f0ca735a" />
-  <p align="center"><i>Semantic search with vector embeddings</i></p>
-</p>
 
 ## Prerequisites
 
@@ -96,6 +96,8 @@ streamlit run app.py
 
 ## How It Works
 
+💡 **Source Code**: You can find the complete source code for this example on [GitHub](https://github.com/pingcap/pytidb/tree/main/examples/vector_search). This working example includes all the necessary files to get you started with semantic search in minutes.
+
 ### 1. Schema Definition
 
 Define a table schema with text and vector fields using `pytidb.schema.TableModel`:
@@ -123,11 +125,10 @@ Configure automatic embedding generation with `EmbeddingFunction("ollama/mxbai-e
 Use the search API to find semantically similar content with distance thresholds and metadata filters:
 
 ```python
-search_query = table.search(query_text)
-if language != "all":
-    search_query = search_query.filter({"meta.language": language})
 df = (
-    search_query.distance_threshold(distance_threshold)
+    table.search(query_text)
+    .filter({"meta.language": language})
+    .distance_threshold(distance_threshold)
     .debug(True)
     .limit(query_limit)
     .to_pandas()
