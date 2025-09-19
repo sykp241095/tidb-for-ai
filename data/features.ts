@@ -13,30 +13,27 @@ export const features: Feature[] = [
       'OpenAI embeddings integration'
     ],
     color: 'from-blue-500 to-blue-600',
-    code: `# Semantic search with RAG
-import tidb_vector as tv
-from openai import OpenAI
+    code: `# Define schema with auto-embedding
+class Chunk(TableModel):
+    id: int = Field(primary_key=True)
+    text: str = Field()
+    text_vec: list[float] = text_embed.VectorField(
+        source_field="text"
+    )
 
-client = tv.connect("mysql://user:pass@host:4000/db")
-openai_client = OpenAI()
-
-# Get embeddings and search
-def semantic_search(query, top_k=5):
-    query_embedding = openai_client.embeddings.create(
-        model="text-embedding-3-small", input=query
-    ).data[0].embedding
-
-    return client.execute("""
-        SELECT content, title,
-               VEC_COSINE_DISTANCE(embedding, %s) as similarity
-        FROM knowledge_base
-        ORDER BY similarity DESC LIMIT %s
-    """, (query_embedding, top_k))
+# Vector search with filtering
+def semantic_search(query_text):
+    return (
+        table.search(query_text)
+        .filter({"meta.language": "en"})
+        .distance_threshold(0.8)
+        .limit(5)
+        .to_pandas()
+    )
 
 # Example usage
-results = semantic_search("How to optimize performance?")
-for content, title, similarity in results:
-    print(f"{title}: {similarity:.3f}")`
+results = semantic_search("slow application performance")
+print(f"Found {len(results)} similar results")`
   },
   {
     icon: Image,

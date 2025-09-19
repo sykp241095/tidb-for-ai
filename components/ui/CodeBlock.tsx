@@ -56,7 +56,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 
       {/* Code Content */}
       <div className="p-4 overflow-x-auto">
-        <pre className="text-sm leading-relaxed font-mono">
+        <pre className="text-sm leading-relaxed font-mono bg-transparent">
           <code
             className={`language-${language}`}
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
