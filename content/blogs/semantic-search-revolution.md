@@ -1,5 +1,5 @@
 ---
-title: "Building Semantic Search Applications"
+title: "Tutorial: Building Semantic Search Applications with TiDB Vector"
 description: "Learn how to implement semantic search using TiDB's vector capabilities and local embedding models to find content by meaning, not just keywords."
 date: "2024-01-30"
 author: "TiDB Team"
@@ -9,8 +9,6 @@ featured: true
 readingTime: 5
 image: "/blog/vector-search-tutorial.jpg"
 ---
-
-# Semantic Search
 
 ## What is Semantic Search?
 
@@ -147,5 +145,6 @@ Get ranked results with similarity scores displayed in an interactive Streamlit 
 - **Source Code**: [View on GitHub](https://github.com/pingcap/pytidb/tree/main/examples/vector_search)
 - **TiDB Vector Documentation**: [Vector Data Types](https://docs.pingcap.com/tidb/stable/vector-search-overview)
 - **Ollama Models**: [Available Embedding Models](https://ollama.com/library)
+- **Hands-on Lab**: [Build Simple Vector Search Apps Using Jupyter Notebook](https://labs.tidb.io/lab?preview=demo_408) (60 min)
 
 Ready to implement semantic search in your application? Start with the complete example in the GitHub repository and see how TiDB's vector search can transform your user experience.
