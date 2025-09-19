@@ -70,17 +70,17 @@ const Features = React.memo(() => {
                     </div>
 
                     {/* Column 2: Feature title and description */}
-                    <div className="col-span-6 space-y-1">
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                    <div className="col-span-7 space-y-1">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                         {feature.title}
                       </h3>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {feature.description}
                       </p>
                     </div>
 
                     {/* Column 3: Buttons */}
-                    <div className="col-span-4 flex flex-col gap-2 justify-center items-end">
+                    <div className="col-span-3 flex flex-col gap-2 justify-center items-end">
                       <button
                         onClick={() => setActiveFeature(index)}
                         className="flex items-center justify-center gap-1.5 w-20 h-8 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors"

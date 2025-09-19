@@ -5,7 +5,7 @@ export const features: Feature[] = [
   {
     icon: Search,
     title: 'Semantic Search & RAG',
-    description: 'Build intelligent document search with vector embeddings and hybrid queries combining semantic similarity with keyword matching.',
+    description: 'Intelligent search with vector embeddings.',
     details: [
       'Vector similarity search with embeddings',
       'Hybrid queries combining vector + text',
@@ -42,7 +42,7 @@ print(f"Found {len(results)} similar results")`
   {
     icon: Image,
     title: 'Image & Text Search',
-    description: 'Multimodal search engine using CLIP embeddings to find relevant images and text content across different media types.',
+    description: 'Search images and text with CLIP embeddings.',
     details: [
       'CLIP embeddings for multimodal search',
       'Cross-modal similarity matching',
@@ -81,7 +81,7 @@ for content_type, desc, similarity in results:
   {
     icon: Layers,
     title: 'Hybrid Search',
-    description: 'Combine vector similarity, full-text search, and structured data filtering in a single query for the most relevant results.',
+    description: 'Vector + full-text + structured filtering.',
     details: [
       'Vector + full-text combination',
       'Weighted scoring algorithms',
@@ -121,7 +121,7 @@ for title, content, score in results:
   {
     icon: Filter,
     title: 'Enhanced Filtering',
-    description: 'Advanced filtering capabilities with vector search, supporting complex conditions and real-time updates.',
+    description: 'Advanced filtering with real-time updates.',
     details: [
       'Multi-dimensional filtering',
       'Dynamic filter combinations',
@@ -170,7 +170,7 @@ for name, price, rating, similarity in results:
   {
     icon: Sparkles,
     title: 'Auto Embedding',
-    description: 'Automatically generate and update vector embeddings for your data with built-in embedding models and triggers.',
+    description: 'Auto-generate embeddings with built-in models.',
     details: [
       'Automatic embedding generation',
       'Built-in embedding models',
