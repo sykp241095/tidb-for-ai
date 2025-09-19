@@ -28,7 +28,7 @@ To build effective image search, you need a vector database that can handle imag
 - **Vector Search**: Store and query high-dimensional vectors for image and text embeddings
 - **Multimodal Support**: Handle images and text in the same embedding space
 - **MySQL Compatibility**: Use familiar SQL syntax and tools you already know
-- **Scalable Storage**: Handle large image datasets with distributed architecture
+- **Auto Embedding**: Automatically generate embeddings for images and text without manual processing
 
 This example demonstrates how to build an image search application using TiDB's vector capabilities with Jina AI embedding models. It supports both text-to-image and image-to-image search with just a few lines of code.
 
