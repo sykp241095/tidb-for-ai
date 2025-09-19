@@ -15,6 +15,10 @@ export const navigationItems: NavigationItem[] = [
     label: 'Gallery'
   },
   {
+    href: '/blog',
+    label: 'Blog'
+  },
+  {
     href: 'https://pingcap.github.io/ai/',
     label: 'Docs',
     external: true
@@ -46,6 +50,7 @@ export const footerSections: FooterSection[] = [
     title: 'Company',
     links: [
       { href: '#', label: 'About' },
+      { href: '/blog', label: 'Blog' },
       { href: '#', label: 'Careers' },
       { href: '#', label: 'Contact' },
       { href: '#', label: 'Press' }

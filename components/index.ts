@@ -12,3 +12,6 @@ export * from '../data'
 
 // Types
 export * from '../types'
+
+// Blog Types
+export * from '../types/blog'
