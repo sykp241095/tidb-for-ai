@@ -1,15 +1,14 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 
-interface NetNode {
-  x: number
-  y: number
-  originalX: number
-  originalY: number
-  vx: number
-  vy: number
-}
+// Constants
+const DEFAULT_GRID_SIZE = 80
+const DEFAULT_SHAKE_INTENSITY = 2
+const DEFAULT_CONNECTION_OPACITY = 0.2
+const ANIMATION_SPEED = 0.001
+const WAVE_FREQUENCY = 0.01
+const SEGMENT_SIZE = 10
 
 interface ShakingNetProps {
   className?: string
@@ -20,13 +19,51 @@ interface ShakingNetProps {
 
 const ShakingNet: React.FC<ShakingNetProps> = ({
   className = '',
-  gridSize = 80,
-  shakeIntensity = 2,
-  connectionOpacity = 0.2
+  gridSize = DEFAULT_GRID_SIZE,
+  shakeIntensity = DEFAULT_SHAKE_INTENSITY,
+  connectionOpacity = DEFAULT_CONNECTION_OPACITY
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const nodesRef = useRef<NetNode[]>([])
   const animationFrameRef = useRef<number>()
+
+  const drawWavyLine = useCallback((
+    ctx: CanvasRenderingContext2D,
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+    isHorizontal: boolean,
+    lineIndex: number
+  ) => {
+    const length = isHorizontal ? endX - startX : endY - startY
+    const segments = Math.ceil(length / SEGMENT_SIZE)
+
+    ctx.beginPath()
+
+    for (let i = 0; i <= segments; i++) {
+      const progress = i / segments
+      const currentPos = isHorizontal
+        ? startX + progress * (endX - startX)
+        : startY + progress * (endY - startY)
+
+      const shakeOffset = Math.sin(
+        Date.now() * ANIMATION_SPEED + currentPos * WAVE_FREQUENCY + lineIndex * 0.5
+      ) * shakeIntensity * 0.5
+
+      const x = isHorizontal ? currentPos : startX + shakeOffset
+      const y = isHorizontal ? startY + shakeOffset : currentPos
+
+      if (i === 0) {
+        ctx.moveTo(x, y)
+      } else {
+        ctx.lineTo(x, y)
+      }
+    }
+
+    ctx.strokeStyle = `rgba(59, 130, 246, ${connectionOpacity})`
+    ctx.lineWidth = 1
+    ctx.stroke()
+  }, [shakeIntensity, connectionOpacity])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -39,29 +76,6 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
       canvas.width = canvas.offsetWidth * window.devicePixelRatio
       canvas.height = canvas.offsetHeight * window.devicePixelRatio
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
-      initializeGrid()
-    }
-
-    const initializeGrid = () => {
-      nodesRef.current = []
-      const cols = Math.ceil(canvas.offsetWidth / gridSize) + 2
-      const rows = Math.ceil(canvas.offsetHeight / gridSize) + 2
-
-      for (let row = -1; row < rows; row++) {
-        for (let col = -1; col < cols; col++) {
-          const x = col * gridSize
-          const y = row * gridSize
-
-          nodesRef.current.push({
-            x,
-            y,
-            originalX: x,
-            originalY: y,
-            vx: (Math.random() - 0.5) * 0.5,
-            vy: (Math.random() - 0.5) * 0.5
-          })
-        }
-      }
     }
 
     resizeCanvas()
@@ -70,93 +84,40 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
     const animate = () => {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
 
-      // Update node positions with subtle shaking
-      nodesRef.current.forEach(node => {
-        // Add random shake
-        node.vx += (Math.random() - 0.5) * 0.1
-        node.vy += (Math.random() - 0.5) * 0.1
-
-        // Apply velocity
-        node.x += node.vx
-        node.y += node.vy
-
-        // Apply damping and pull back to original position
-        const returnForceX = (node.originalX - node.x) * 0.02
-        const returnForceY = (node.originalY - node.y) * 0.02
-
-        node.vx += returnForceX
-        node.vy += returnForceY
-
-        // Apply friction
-        node.vx *= 0.98
-        node.vy *= 0.98
-
-        // Limit shake intensity
-        const distanceFromOriginal = Math.sqrt(
-          Math.pow(node.x - node.originalX, 2) + Math.pow(node.y - node.originalY, 2)
-        )
-        if (distanceFromOriginal > shakeIntensity) {
-          const angle = Math.atan2(node.y - node.originalY, node.x - node.originalX)
-          node.x = node.originalX + Math.cos(angle) * shakeIntensity
-          node.y = node.originalY + Math.sin(angle) * shakeIntensity
-        }
-      })
-
-      // Draw grid lines with subtle shaking effect
       const cols = Math.ceil(canvas.offsetWidth / gridSize) + 2
       const rows = Math.ceil(canvas.offsetHeight / gridSize) + 2
 
-      // Draw horizontal lines with gentle shake
+      // Draw horizontal lines
       for (let row = -1; row < rows; row++) {
-        const baseY = row * gridSize
-        if (baseY >= -gridSize && baseY <= canvas.offsetHeight + gridSize) {
-          ctx.beginPath()
-
-          // Create wavy line with subtle shake
-          const segments = Math.ceil((canvas.offsetWidth + 2 * gridSize) / 10)
-          for (let i = 0; i <= segments; i++) {
-            const x = -gridSize + (i / segments) * (canvas.offsetWidth + 2 * gridSize)
-            const shakeY = baseY + Math.sin(Date.now() * 0.001 + x * 0.01 + row * 0.5) * shakeIntensity * 0.5
-
-            if (i === 0) {
-              ctx.moveTo(x, shakeY)
-            } else {
-              ctx.lineTo(x, shakeY)
-            }
-          }
-
-          ctx.strokeStyle = `rgba(59, 130, 246, ${connectionOpacity})`
-          ctx.lineWidth = 1
-          ctx.stroke()
+        const y = row * gridSize
+        if (y >= -gridSize && y <= canvas.offsetHeight + gridSize) {
+          drawWavyLine(
+            ctx,
+            -gridSize,
+            y,
+            canvas.offsetWidth + gridSize,
+            y,
+            true,
+            row
+          )
         }
       }
 
-      // Draw vertical lines with gentle shake
+      // Draw vertical lines
       for (let col = -1; col < cols; col++) {
-        const baseX = col * gridSize
-        if (baseX >= -gridSize && baseX <= canvas.offsetWidth + gridSize) {
-          ctx.beginPath()
-
-          // Create wavy line with subtle shake
-          const segments = Math.ceil((canvas.offsetHeight + 2 * gridSize) / 10)
-          for (let i = 0; i <= segments; i++) {
-            const y = -gridSize + (i / segments) * (canvas.offsetHeight + 2 * gridSize)
-            const shakeX = baseX + Math.sin(Date.now() * 0.001 + y * 0.01 + col * 0.5) * shakeIntensity * 0.5
-
-            if (i === 0) {
-              ctx.moveTo(shakeX, y)
-            } else {
-              ctx.lineTo(shakeX, y)
-            }
-          }
-
-          ctx.strokeStyle = `rgba(59, 130, 246, ${connectionOpacity})`
-          ctx.lineWidth = 1
-          ctx.stroke()
+        const x = col * gridSize
+        if (x >= -gridSize && x <= canvas.offsetWidth + gridSize) {
+          drawWavyLine(
+            ctx,
+            x,
+            -gridSize,
+            x,
+            canvas.offsetHeight + gridSize,
+            false,
+            col
+          )
         }
       }
-
-      // Remove individual nodes since we now have a clean grid pattern
 
       animationFrameRef.current = requestAnimationFrame(animate)
     }
@@ -169,13 +130,13 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [gridSize, shakeIntensity, connectionOpacity])
+  }, [gridSize, shakeIntensity, connectionOpacity, drawWavyLine])
 
   return (
     <canvas
       ref={canvasRef}
-      className={`absolute inset-0 pointer-events-none ${className}`}
-      style={{ background: 'transparent' }}
+      className={`fixed inset-0 w-screen h-screen pointer-events-none ${className}`}
+      style={{ background: 'transparent', zIndex: 1 }}
     />
   )
 }
