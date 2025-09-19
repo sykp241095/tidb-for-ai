@@ -3,6 +3,10 @@ import { NavigationItem, FooterSection, SocialLink } from '@/types'
 
 export const navigationItems: NavigationItem[] = [
   {
+    href: '/what-is-tidb',
+    label: 'What is TiDB'
+  },
+  {
     href: '/#features',
     label: 'Features'
   },
