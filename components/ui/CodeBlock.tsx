@@ -18,7 +18,8 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
     Prism.highlightAll()
   }, [code])
 
-  const highlightedCode = Prism.highlight(code, Prism.languages.python, 'python')
+  const languageObj = Prism.languages[language] || Prism.languages.python
+  const highlightedCode = Prism.highlight(code, languageObj, language)
 
   return (
     <div className="relative bg-gray-900 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-700 dark:border-gray-600 group">
@@ -57,7 +58,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
       <div className="p-4 overflow-x-auto">
         <pre className="text-sm leading-relaxed font-mono">
           <code
-            className="language-python"
+            className={`language-${language}`}
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
           />
         </pre>

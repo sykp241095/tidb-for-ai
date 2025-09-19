@@ -23,10 +23,12 @@ const BlogPost: React.FC<BlogPostProps> = ({ post, relatedPosts }) => {
   })
 
   const handleShare = async () => {
+    if (typeof window === 'undefined') return
+
     const url = window.location.href
     const title = post.title
 
-    if (navigator.share) {
+    if (navigator?.share) {
       try {
         await navigator.share({
           title,
@@ -34,11 +36,19 @@ const BlogPost: React.FC<BlogPostProps> = ({ post, relatedPosts }) => {
         })
       } catch (error) {
         // Fallback to clipboard
-        navigator.clipboard.writeText(url)
+        if (navigator?.clipboard) {
+          navigator.clipboard.writeText(url).catch(() => {
+            // Silent fallback failure
+          })
+        }
       }
     } else {
       // Fallback to clipboard
-      navigator.clipboard.writeText(url)
+      if (navigator?.clipboard) {
+        navigator.clipboard.writeText(url).catch(() => {
+          // Silent fallback failure
+        })
+      }
     }
   }
 

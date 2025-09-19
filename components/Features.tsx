@@ -10,7 +10,7 @@ const Features = React.memo(() => {
   const [activeFeature, setActiveFeature] = useState(0)
   const { copied: codeCopied, copyToClipboard } = useClipboard()
   const [showVideoModal, setShowVideoModal] = useState(false)
-  const [selectedFeature, setSelectedFeature] = useState<any>(null)
+  const [selectedFeature, setSelectedFeature] = useState<typeof features[0] | null>(null)
 
   React.useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -23,7 +23,7 @@ const Features = React.memo(() => {
     return () => document.removeEventListener('keydown', handleEscape)
   }, [showVideoModal])
 
-  const handleWatchVideo = (feature: any) => {
+  const handleWatchVideo = (feature: typeof features[0]) => {
     setSelectedFeature(feature)
     setShowVideoModal(true)
   }

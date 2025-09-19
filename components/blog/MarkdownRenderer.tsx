@@ -47,7 +47,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           // Custom paragraph styling
           p: ({ children, ...props }) => {
             // Check if this paragraph has align attribute (for center-aligned images)
-            const hasAlign = (props as any).align
+            const hasAlign = (props as { align?: string }).align
             if (hasAlign) {
               return (
                 <div className={`mb-4 leading-relaxed text-gray-700 dark:text-gray-300 text-${hasAlign}`}>
@@ -151,6 +151,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             if (isExternalUrl) {
               return (
                 <div className="my-6">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={src || ''}
                     alt={alt || ''}
