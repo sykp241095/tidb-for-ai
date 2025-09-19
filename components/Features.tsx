@@ -5,7 +5,6 @@ import { Copy, Check, Layers, Play, Code2 } from 'lucide-react'
 import { features, additionalFeatures } from '@/data'
 import { Button, Card, CodeBlock, Section } from '@/components/ui'
 import { useClipboard } from '@/hooks'
-import { NeuralNetwork } from '@/components/effects'
 
 const Features = React.memo(() => {
   const [activeFeature, setActiveFeature] = useState(0)
@@ -31,9 +30,6 @@ const Features = React.memo(() => {
 
   return (
     <section id="features" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-white dark:bg-black overflow-hidden">
-      {/* AI Background Effects */}
-      <NeuralNetwork className="opacity-15 dark:opacity-25" layers={[3, 5, 4, 2]} />
-
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-16">

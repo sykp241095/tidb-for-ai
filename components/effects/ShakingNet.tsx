@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useCallback } from 'react'
 // Constants
 const DEFAULT_GRID_SIZE = 80
 const DEFAULT_SHAKE_INTENSITY = 2
-const DEFAULT_CONNECTION_OPACITY = 0.2
+const DEFAULT_LINE_OPACITY = 0.2
 const ANIMATION_SPEED = 0.001
 const WAVE_FREQUENCY = 0.01
 const SEGMENT_SIZE = 10
@@ -14,14 +14,14 @@ interface ShakingNetProps {
   className?: string
   gridSize?: number
   shakeIntensity?: number
-  connectionOpacity?: number
+  lineOpacity?: number
 }
 
 const ShakingNet: React.FC<ShakingNetProps> = ({
   className = '',
   gridSize = DEFAULT_GRID_SIZE,
   shakeIntensity = DEFAULT_SHAKE_INTENSITY,
-  connectionOpacity = DEFAULT_CONNECTION_OPACITY
+  lineOpacity = DEFAULT_LINE_OPACITY
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number>()
@@ -60,10 +60,10 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
       }
     }
 
-    ctx.strokeStyle = `rgba(59, 130, 246, ${connectionOpacity})`
+    ctx.strokeStyle = `rgba(59, 130, 246, ${lineOpacity})`
     ctx.lineWidth = 1
     ctx.stroke()
-  }, [shakeIntensity, connectionOpacity])
+  }, [shakeIntensity, lineOpacity])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -130,7 +130,7 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [gridSize, shakeIntensity, connectionOpacity, drawWavyLine])
+  }, [gridSize, shakeIntensity, lineOpacity, drawWavyLine])
 
   return (
     <canvas

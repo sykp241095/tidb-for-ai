@@ -22,6 +22,12 @@ interface GridVectorSearchProps {
   connectionOpacity?: number
 }
 
+interface GridShakeState {
+  isShaking: boolean
+  startTime: number
+  intensity: number
+}
+
 const GridVectorSearch: React.FC<GridVectorSearchProps> = ({
   className = '',
   gridSize = 100,
@@ -33,6 +39,7 @@ const GridVectorSearch: React.FC<GridVectorSearchProps> = ({
   const gridPointsRef = useRef<GridPoint[]>([])
   const lastSearchRef = useRef<number>(0)
   const searchCenterRef = useRef<{ x: number; y: number } | null>(null)
+  const shakeStateRef = useRef<GridShakeState>({ isShaking: false, startTime: 0, intensity: 0 })
 
   const calculateSimilarity = useCallback((x1: number, y1: number, x2: number, y2: number) => {
     const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
@@ -53,6 +60,23 @@ const GridVectorSearch: React.FC<GridVectorSearchProps> = ({
     const length = isHorizontal ? endX - startX : endY - startY
     const segments = Math.ceil(length / 10)
 
+    // Calculate shake intensity based on search state
+    let currentShakeIntensity = shakeIntensity * 0.5
+
+    if (shakeStateRef.current.isShaking) {
+      const shakeAge = time - shakeStateRef.current.startTime
+      const shakeDuration = 800 // 0.8 seconds
+
+      if (shakeAge < shakeDuration) {
+        // Create a strong shake that decays quickly
+        const shakeProgress = shakeAge / shakeDuration
+        const decayFactor = Math.exp(-shakeProgress * 4) // Exponential decay
+        currentShakeIntensity = shakeIntensity * 3 * decayFactor
+      } else {
+        shakeStateRef.current.isShaking = false
+      }
+    }
+
     ctx.beginPath()
 
     for (let i = 0; i <= segments; i++) {
@@ -63,7 +87,7 @@ const GridVectorSearch: React.FC<GridVectorSearchProps> = ({
 
       const shakeOffset = Math.sin(
         time * 0.001 + currentPos * 0.01 + lineIndex * 0.5
-      ) * shakeIntensity * 0.5
+      ) * currentShakeIntensity
 
       const x = isHorizontal ? currentPos : startX + shakeOffset
       const y = isHorizontal ? startY + shakeOffset : currentPos
@@ -123,6 +147,13 @@ const GridVectorSearch: React.FC<GridVectorSearchProps> = ({
 
       // Trigger new search periodically
       if (timestamp - lastSearchRef.current > SEARCH_INTERVAL) {
+        // Trigger grid shake
+        shakeStateRef.current = {
+          isShaking: true,
+          startTime: timestamp,
+          intensity: shakeIntensity * 3
+        }
+
         // Pick random search center
         const centerX = Math.random() * canvas.offsetWidth
         const centerY = Math.random() * canvas.offsetHeight
