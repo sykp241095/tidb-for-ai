@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { CodeBlockProps } from '@/types'
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -14,8 +14,35 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   onCopy,
   copied = false
 }) => {
-  const displayFilename = filename || `example.${language}`
+  const displayFilename = useMemo(() => filename || `example.${language}`, [filename, language])
   const [selectedLine, setSelectedLine] = useState<number | null>(null)
+
+  // Memoize syntax highlighter props for better performance
+  const syntaxHighlighterProps = useMemo(() => ({
+    language,
+    style: tomorrow,
+    showLineNumbers: true,
+    lineNumberStyle: {
+      minWidth: '2.5rem',
+      paddingRight: '1rem',
+      textAlign: 'right' as const,
+      color: '#6b7280',
+      backgroundColor: 'transparent',
+      userSelect: 'none' as const
+    },
+    customStyle: {
+      margin: 0,
+      padding: '1rem',
+      backgroundColor: 'transparent',
+      fontSize: '0.875rem',
+      lineHeight: '1.5'
+    },
+    codeTagProps: {
+      style: {
+        backgroundColor: 'transparent'
+      }
+    }
+  }), [language])
 
   return (
     <div className="relative bg-gray-900 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-700 dark:border-gray-600 group">
@@ -53,29 +80,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
       {/* Code Content */}
       <div className="overflow-x-auto">
         <SyntaxHighlighter
-          language={language}
-          style={tomorrow}
-          showLineNumbers={true}
-          lineNumberStyle={{
-            minWidth: '2.5rem',
-            paddingRight: '1rem',
-            textAlign: 'right',
-            color: '#6b7280',
-            backgroundColor: 'transparent',
-            userSelect: 'none'
-          }}
-          customStyle={{
-            margin: 0,
-            padding: '1rem',
-            backgroundColor: 'transparent',
-            fontSize: '0.875rem',
-            lineHeight: '1.5'
-          }}
-          codeTagProps={{
-            style: {
-              backgroundColor: 'transparent'
-            }
-          }}
+          {...syntaxHighlighterProps}
           lineProps={(lineNumber) => ({
             style: {
               backgroundColor: selectedLine === lineNumber ? 'rgba(59, 130, 246, 0.2)' : 'transparent',

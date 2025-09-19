@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Copy, Check, Layers, Play, Code2 } from 'lucide-react'
 import { features, additionalFeatures } from '@/data'
 import { Button, Card, CodeBlock, Section } from '@/components/ui'
@@ -23,10 +23,22 @@ const Features = React.memo(() => {
     return () => document.removeEventListener('keydown', handleEscape)
   }, [showVideoModal])
 
-  const handleWatchVideo = (feature: typeof features[0]) => {
+  const handleWatchVideo = useCallback((feature: typeof features[0]) => {
     setSelectedFeature(feature)
     setShowVideoModal(true)
-  }
+  }, [])
+
+  const handleSetActiveFeature = useCallback((index: number) => {
+    setActiveFeature(index)
+  }, [])
+
+  const handleCopyCode = useCallback(() => {
+    if (features[activeFeature]) {
+      copyToClipboard(features[activeFeature].code)
+    }
+  }, [activeFeature, copyToClipboard])
+
+  const activeFeatureData = useMemo(() => features[activeFeature], [activeFeature])
 
   return (
     <section id="features" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-white dark:bg-black overflow-hidden">
@@ -53,7 +65,7 @@ const Features = React.memo(() => {
               return (
                 <div
                   key={`feature-${index}-${feature.title}`}
-                  onClick={() => setActiveFeature(index)}
+                  onClick={() => handleSetActiveFeature(index)}
                   className={`relative p-4 rounded-lg border-2 transition-all duration-200 w-full group cursor-pointer ${
                     activeFeature === index
                       ? 'border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-900 shadow-sm'
@@ -82,7 +94,7 @@ const Features = React.memo(() => {
                     {/* Column 3: Buttons */}
                     <div className="col-span-3 flex flex-col gap-2 justify-center items-end">
                       <button
-                        onClick={() => setActiveFeature(index)}
+                        onClick={() => handleSetActiveFeature(index)}
                         className="flex items-center justify-center gap-1.5 w-20 h-8 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors"
                       >
                         <Code2 size={16} />
@@ -113,11 +125,11 @@ const Features = React.memo(() => {
           </div>
 
           {/* Code Example */}
-          {features[activeFeature] && (
+          {activeFeatureData && (
             <CodeBlock
-              code={features[activeFeature].code}
-              filename={`${features[activeFeature].title.toLowerCase().replace(/ /g, '_').replace(/&/g, 'and')}.py`}
-              onCopy={() => copyToClipboard(features[activeFeature].code)}
+              code={activeFeatureData.code}
+              filename={`${activeFeatureData.title.toLowerCase().replace(/ /g, '_').replace(/&/g, 'and')}.py`}
+              onCopy={handleCopyCode}
               copied={codeCopied}
             />
           )}

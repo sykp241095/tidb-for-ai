@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useCallback } from 'react'
+import React, { useEffect, useRef, useCallback, useMemo } from 'react'
 
 // Constants
 const DEFAULT_GRID_SIZE = 80
@@ -9,6 +9,8 @@ const DEFAULT_LINE_OPACITY = 0.2
 const ANIMATION_SPEED = 0.001
 const WAVE_FREQUENCY = 0.01
 const SEGMENT_SIZE = 10
+const TARGET_FPS = 60
+const FRAME_INTERVAL = 1000 / TARGET_FPS
 
 interface ShakingNetProps {
   className?: string
@@ -25,6 +27,10 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number>()
+  const lastFrameTimeRef = useRef<number>(0)
+  const gridDataRef = useRef<{ cols: number; rows: number; width: number; height: number } | null>(null)
+
+  const strokeStyle = useMemo(() => `rgba(59, 130, 246, ${lineOpacity})`, [lineOpacity])
 
   const drawWavyLine = useCallback((
     ctx: CanvasRenderingContext2D,
@@ -33,7 +39,8 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
     endX: number,
     endY: number,
     isHorizontal: boolean,
-    lineIndex: number
+    lineIndex: number,
+    time: number
   ) => {
     const length = isHorizontal ? endX - startX : endY - startY
     const segments = Math.ceil(length / SEGMENT_SIZE)
@@ -47,7 +54,7 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
         : startY + progress * (endY - startY)
 
       const shakeOffset = Math.sin(
-        Date.now() * ANIMATION_SPEED + currentPos * WAVE_FREQUENCY + lineIndex * 0.5
+        time * ANIMATION_SPEED + currentPos * WAVE_FREQUENCY + lineIndex * 0.5
       ) * shakeIntensity * 0.5
 
       const x = isHorizontal ? currentPos : startX + shakeOffset
@@ -60,10 +67,8 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
       }
     }
 
-    ctx.strokeStyle = `rgba(59, 130, 246, ${lineOpacity})`
-    ctx.lineWidth = 1
     ctx.stroke()
-  }, [shakeIntensity, lineOpacity])
+  }, [shakeIntensity, strokeStyle])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -73,32 +78,58 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
     if (!ctx) return
 
     const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+      const width = canvas.offsetWidth
+      const height = canvas.offsetHeight
+      const dpr = window.devicePixelRatio || 1
+
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      ctx.scale(dpr, dpr)
+
+      // Cache grid calculations
+      gridDataRef.current = {
+        cols: Math.ceil(width / gridSize) + 2,
+        rows: Math.ceil(height / gridSize) + 2,
+        width,
+        height
+      }
     }
 
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
+    const animate = (currentTime: number) => {
+      // Frame rate limiting
+      if (currentTime - lastFrameTimeRef.current < FRAME_INTERVAL) {
+        animationFrameRef.current = requestAnimationFrame(animate)
+        return
+      }
+      lastFrameTimeRef.current = currentTime
 
-      const cols = Math.ceil(canvas.offsetWidth / gridSize) + 2
-      const rows = Math.ceil(canvas.offsetHeight / gridSize) + 2
+      const gridData = gridDataRef.current
+      if (!gridData) return
+
+      ctx.clearRect(0, 0, gridData.width, gridData.height)
+
+      // Set stroke style once per frame
+      ctx.strokeStyle = strokeStyle
+      ctx.lineWidth = 1
+
+      const { cols, rows, width, height } = gridData
 
       // Draw horizontal lines
       for (let row = -1; row < rows; row++) {
         const y = row * gridSize
-        if (y >= -gridSize && y <= canvas.offsetHeight + gridSize) {
+        if (y >= -gridSize && y <= height + gridSize) {
           drawWavyLine(
             ctx,
             -gridSize,
             y,
-            canvas.offsetWidth + gridSize,
+            width + gridSize,
             y,
             true,
-            row
+            row,
+            currentTime
           )
         }
       }
@@ -106,15 +137,16 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
       // Draw vertical lines
       for (let col = -1; col < cols; col++) {
         const x = col * gridSize
-        if (x >= -gridSize && x <= canvas.offsetWidth + gridSize) {
+        if (x >= -gridSize && x <= width + gridSize) {
           drawWavyLine(
             ctx,
             x,
             -gridSize,
             x,
-            canvas.offsetHeight + gridSize,
+            height + gridSize,
             false,
-            col
+            col,
+            currentTime
           )
         }
       }
@@ -122,7 +154,7 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
       animationFrameRef.current = requestAnimationFrame(animate)
     }
 
-    animate()
+    animationFrameRef.current = requestAnimationFrame(animate)
 
     return () => {
       window.removeEventListener('resize', resizeCanvas)
@@ -130,7 +162,7 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [gridSize, shakeIntensity, lineOpacity, drawWavyLine])
+  }, [gridSize, shakeIntensity, lineOpacity, drawWavyLine, strokeStyle])
 
   return (
     <canvas

@@ -68,18 +68,154 @@ a {
 
 /* Code block styling */
 pre {
-  background: #0d1117;
-  border-radius: 8px;
-  padding: 1rem;
-  overflow-x: auto;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Terminal style for bash commands */
+pre[class*="language-bash"]::before,
+pre[class*="language-shell"]::before,
+pre[class*="language-sh"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  border-bottom: 1px solid #444;
+}
+
+pre[class*="language-bash"]::after,
+pre[class*="language-shell"]::after,
+pre[class*="language-sh"]::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #28ca42;
+}
+
+pre[class*="language-bash"],
+pre[class*="language-shell"],
+pre[class*="language-sh"] {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 40px 1rem 1rem 1rem;
+  border: 1px solid #333;
+}
+
+pre[class*="language-bash"] code::before,
+pre[class*="language-shell"] code::before,
+pre[class*="language-sh"] code::before {
+  content: "$ ";
+  color: #50fa7b;
+  font-weight: bold;
+  user-select: none;
+}
+
+/* Code editor style for Python */
+pre[class*="language-python"]::before {
+  content: "Python";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+  border-bottom: 1px solid #3c3c3c;
+  color: #cccccc;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  padding-left: 60px;
+}
+
+pre[class*="language-python"]::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #28ca42;
+}
+
+pre[class*="language-python"] {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 40px 1rem 1rem 1rem;
+  border: 1px solid #3c3c3c;
+}
+
+/* Line numbers for Python */
+pre[class*="language-python"] .line-numbers-rows {
+  background: #2d2d2d;
+  border-right: 1px solid #3c3c3c;
+  color: #858585;
+  padding-right: 0.5rem;
+}
+
+/* Syntax highlighting improvements */
+.token.comment { color: #6a9955; font-style: italic; }
+.token.string { color: #ce9178; }
+.token.number { color: #b5cea8; }
+.token.boolean { color: #569cd6; }
+.token.keyword { color: #c586c0; font-weight: 500; }
+.token.function { color: #dcdcaa; }
+.token.class-name { color: #4ec9b0; }
+.token.operator { color: #d4d4d4; }
+.token.punctuation { color: #cccccc; }
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  pre[class*="language-bash"],
+  pre[class*="language-shell"],
+  pre[class*="language-sh"],
+  pre[class*="language-python"] {
+    background: #0d1117;
+    border-color: #30363d;
+  }
+
+  pre[class*="language-bash"]::before,
+  pre[class*="language-shell"]::before,
+  pre[class*="language-sh"]::before {
+    background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+    border-bottom-color: #30363d;
+  }
+
+  pre[class*="language-python"]::before {
+    background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+    border-bottom-color: #30363d;
+    color: #f0f6fc;
+  }
 }
 
 code {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
   font-size: 0.875rem;
+  background: rgba(175, 184, 193, 0.15);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  color: #e36209;
+}
+
+code[class*="language-"] {
+  background: transparent;
+  color: inherit;
+  padding: 0;
 }
 
 .gradient-text {
