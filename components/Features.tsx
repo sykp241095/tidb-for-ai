@@ -12,6 +12,17 @@ const Features = React.memo(() => {
   const [showVideoModal, setShowVideoModal] = useState(false)
   const [selectedFeature, setSelectedFeature] = useState<any>(null)
 
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showVideoModal) {
+        setShowVideoModal(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [showVideoModal])
+
   const handleWatchVideo = (feature: any) => {
     setSelectedFeature(feature)
     setShowVideoModal(true)
