@@ -5,7 +5,6 @@ import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { tomorrow } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import python from 'react-syntax-highlighter/dist/cjs/languages/prism/python'
 
-// Register the python language
 SyntaxHighlighter.registerLanguage('python', python)
 
 const CodeBlock: React.FC<CodeBlockProps> = ({
@@ -17,10 +16,6 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 }) => {
   const displayFilename = filename || `example.${language}`
   const [selectedLine, setSelectedLine] = useState<number | null>(null)
-
-  const handleLineClick = (lineNumber: number) => {
-    setSelectedLine(selectedLine === lineNumber ? null : lineNumber)
-  }
 
   return (
     <div className="relative bg-gray-900 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-700 dark:border-gray-600 group">
@@ -87,7 +82,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
               cursor: 'pointer',
               transition: 'background-color 0.15s ease'
             },
-            onClick: () => handleLineClick(lineNumber)
+            onClick: () => setSelectedLine(selectedLine === lineNumber ? null : lineNumber)
           })}
         >
           {code}
