@@ -21,7 +21,7 @@ const Navigation = React.memo(() => {
         <div className="flex justify-between items-center h-16">
           <a href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <Image src="/tidb-logo.png" alt="TiDB Logo" width={32} height={32} className="w-8 h-8" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">TiDBCloud for AI</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">TiDB for AI</span>
           </a>
 
           {/* Desktop Navigation */}

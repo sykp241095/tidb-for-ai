@@ -36,57 +36,36 @@ const Features = React.memo(() => {
                 <button
                   key={`feature-${index}-${feature.title}`}
                   onClick={() => setActiveFeature(index)}
-                  className={`relative p-6 rounded-2xl border transition-all duration-300 cursor-pointer bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full text-left ${
+                  className={`relative pl-20 pr-3 py-3 rounded-lg border transition-all duration-200 cursor-pointer w-full text-left group ${
                     activeFeature === index
-                      ? 'border-blue-500/50 dark:border-blue-400/50 shadow-lg shadow-blue-500/10 dark:shadow-blue-400/10'
-                      : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
+                      ? 'border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-900 shadow-sm'
+                      : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-black hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-sm'
                   }`}
                   aria-pressed={activeFeature === index}
                   aria-label={`View ${feature.title} code example`}
                 >
-                  {/* Terminal-style header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex gap-1.5">
-                        <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
-                        <div className="w-2.5 h-2.5 bg-yellow-500 rounded-full"></div>
-                        <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
-                      </div>
-                      <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
-                        {feature.title.toLowerCase().replace(/ /g, '_').replace(/&/g, 'and')}.py
-                      </span>
-                    </div>
-                    <div className={`p-2 rounded-lg bg-gradient-to-r ${feature.color} text-white`}>
-                      <Icon size={16} />
+                  {/* Icon positioned at left edge */}
+                  <div className="absolute left-2 top-2 bottom-2 flex items-center">
+                    <div className="h-full aspect-square flex items-center justify-center">
+                      <Icon size={40} className="text-gray-600 dark:text-gray-400" />
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white font-mono">
+                  <div className="space-y-1">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                       {feature.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                       {feature.description}
                     </p>
 
-                    {/* Tech tags */}
-                    <div className="flex flex-wrap gap-1.5 pt-2">
-                      {feature.details.slice(0, 2).map((detail, detailIndex) => (
-                        <span
-                          key={detailIndex}
-                          className="px-2 py-1 bg-gray-200/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 rounded text-xs font-mono"
-                        >
-                          {detail}
-                        </span>
-                      ))}
-                    </div>
                   </div>
 
                   {/* Active indicator */}
                   {activeFeature === index && (
-                    <div className="absolute top-3 right-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <div className="absolute top-2 right-3">
+                      <div className="w-2 h-2 bg-gray-900 dark:bg-white rounded-full"></div>
                     </div>
                   )}
                 </button>
@@ -123,10 +102,7 @@ const Features = React.memo(() => {
               return (
                 <div
                   key={index}
-                  className={`bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-black rounded-2xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 group hover:shadow-lg ${
-                    hasCode ? 'cursor-pointer' : ''
-                  }`}
-                  onClick={() => hasCode && setActiveFeature(features.length + index)}
+                  className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-black rounded-2xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 group hover:shadow-lg"
                 >
                   <div className="mb-6">
                     <div className="w-12 h-12 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-xl flex items-center justify-center group-hover:from-blue-500 group-hover:to-purple-500 transition-all duration-300">
@@ -139,82 +115,11 @@ const Features = React.memo(() => {
                   <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                     {feature.description}
                   </p>
-                  {hasCode && (
-                    <div className="text-blue-600 dark:text-blue-400 text-sm font-medium">
-                      Click to see code example →
-                    </div>
-                  )}
                 </div>
               )
             })}
           </div>
 
-          {/* Hybrid Query Code Example */}
-          {activeFeature === features.length && additionalFeatures[0]?.code && (
-            <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl overflow-hidden shadow-2xl">
-              {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  </div>
-                  <span className="text-gray-300 text-sm font-medium">
-                    hybrid_search.sql
-                  </span>
-                </div>
-                <button
-                  onClick={() => copyToClipboard(additionalFeatures[0].code || '')}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors text-sm"
-                >
-                  {codeCopied ? (
-                    <>
-                      <Check size={16} className="text-green-400" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={16} />
-                      Copy
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Code Content */}
-              <div className="p-6 overflow-x-auto">
-                <pre className="text-sm text-gray-100 leading-relaxed">
-                  <code>
-                    {(additionalFeatures[0].code || '').split('\n').map((line, index) => (
-                      <div key={index} className="text-gray-100">
-                        {line}
-                      </div>
-                    ))}
-                  </code>
-                </pre>
-              </div>
-
-              {/* Feature Details */}
-              <div className="px-6 pb-6">
-                <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white shrink-0">
-                      <Layers size={20} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white mb-1">
-                        Hybrid Queries
-                      </h3>
-                      <p className="text-gray-300 text-sm">
-                        Combine vector similarity, full-text search, and structured data filtering in a single query for the most relevant results.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Quick Start Section */}

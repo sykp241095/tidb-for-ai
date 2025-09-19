@@ -198,7 +198,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ post, relatedPosts }) => {
                   Stay Updated
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Get the latest articles and updates about TiDB AI directly in your inbox.
+                  Get the latest articles and updates about TiDB for AI directly in your inbox.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                   <input

@@ -67,7 +67,7 @@ const BlogListing: React.FC<BlogListingProps> = ({
         <Section background="gradient" padding="lg" className="pt-32">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              TiDB AI <span className="gradient-text">Blog</span>
+              TiDB for AI <span className="gradient-text">Blog</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed">
               Insights, tutorials, and updates about vector databases, AI applications, and building intelligent systems with TiDB.

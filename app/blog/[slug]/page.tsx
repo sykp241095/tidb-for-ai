@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   }
 
   return {
-    title: `${post.title} - TiDB AI Blog`,
+    title: `${post.title} - TiDB for AI Blog`,
     description: post.description,
     authors: [{ name: post.author }],
     keywords: post.tags.join(', '),

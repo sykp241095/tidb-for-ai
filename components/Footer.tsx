@@ -13,7 +13,7 @@ const Footer = React.memo(() => {
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-6">
               <Image src="/tidb-logo.png" alt="TiDB Logo" width={32} height={32} className="w-8 h-8" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">TiDBCloud for AI</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">TiDB for AI</span>
             </div>
             <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed max-w-md">
               The AI-native database that combines vector search, full-text search,

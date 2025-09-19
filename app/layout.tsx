@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     description: 'TiDB combines vector database, full-text search, and MySQL compatibility in one unified platform for AI developers.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'TiDB AI',
+    siteName: 'TiDB for AI',
   },
   twitter: {
     card: 'summary_large_image',
