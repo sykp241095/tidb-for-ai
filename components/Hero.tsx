@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { ArrowRight, Copy, Check, BookOpen } from 'lucide-react'
 import { useClipboard } from '@/hooks'
 import { Button, Section } from '@/components/ui'
-import { ParticleField } from '@/components/effects'
+import { ShakingNet } from '@/components/effects'
 
 const Hero = React.memo(() => {
   const [mounted, setMounted] = useState(false)
@@ -35,7 +35,7 @@ const Hero = React.memo(() => {
   return (
     <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-black dark:to-gray-950 overflow-hidden">
       {/* Animated Background Effects */}
-      <ParticleField className="opacity-30 dark:opacity-50" />
+      <ShakingNet className="opacity-40 dark:opacity-60" gridSize={50} shakeIntensity={1.5} connectionOpacity={0.15} />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center max-w-4xl mx-auto">
