@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'PingCAP' }],
   creator: 'PingCAP',
   publisher: 'PingCAP',
+  icons: {
+    icon: '/tidb-logo.png',
+    shortcut: '/tidb-logo.png',
+    apple: '/tidb-logo.png',
+  },
   openGraph: {
     title: 'TiDB - AI-Native Database for Modern Developers',
     description: 'TiDB combines vector database, full-text search, and MySQL compatibility in one unified platform for AI developers.',

@@ -2,10 +2,10 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Clock, User, Tag, Share2, BookOpen } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, Tag, Share2 } from 'lucide-react'
 import { BlogPost as BlogPostType, BlogSummary } from '@/types/blog'
 import MarkdownRenderer from '@/components/blog/MarkdownRenderer'
-import BlogCard from '@/components/blog/BlogCard'
+import RelatedArticles from '@/components/blog/RelatedArticles'
 import { Button, Badge, Section } from '@/components/ui'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
@@ -174,36 +174,14 @@ const BlogPost: React.FC<BlogPostProps> = ({ post, relatedPosts }) => {
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <Section background="gray" padding="lg">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex items-center gap-3 mb-8">
-                <BookOpen className="text-gray-600 dark:text-gray-400" size={24} />
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Related Articles
-                </h2>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {relatedPosts.map((relatedPost) => (
-                  <BlogCard key={relatedPost.slug} post={relatedPost} />
-                ))}
-              </div>
-
-              <div className="text-center mt-12">
-                <Link href="/blog">
-                  <Button variant="outline" size="lg">
-                    View All Articles
-                  </Button>
-                </Link>
-              </div>
-            </div>
+            <RelatedArticles posts={relatedPosts} />
           </Section>
         )}
 
         {/* Newsletter CTA */}
         <Section background="white" padding="lg">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-1">
-              <div className="bg-white dark:bg-black rounded-[22px] px-8 py-12">
+            <div className="bg-white dark:bg-black rounded-3xl px-8 py-12">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                   Stay Updated
                 </h3>
@@ -220,7 +198,6 @@ const BlogPost: React.FC<BlogPostProps> = ({ post, relatedPosts }) => {
                     Subscribe
                   </Button>
                 </div>
-              </div>
             </div>
           </div>
         </Section>

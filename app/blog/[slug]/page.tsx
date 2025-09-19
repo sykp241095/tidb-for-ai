@@ -56,7 +56,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
-  const relatedPosts = getRelatedBlogPosts(post, 3)
+  const relatedPosts = getRelatedBlogPosts(post, 2)
 
   return <BlogPost post={post} relatedPosts={relatedPosts} />
 }
