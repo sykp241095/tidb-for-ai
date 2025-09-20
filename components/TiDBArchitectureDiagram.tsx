@@ -71,60 +71,119 @@ const TiDBNode = ({ data }: { data: any }) => (
   </motion.div>
 )
 
-const StorageNode = ({ data }: { data: any }) => (
-  <motion.div
-    className="px-5 py-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg text-white shadow-lg border-2 border-purple-400 min-w-[220px]"
-    initial={{ opacity: 0, x: -50 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.5, delay: 0.4 }}
-    whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(168, 85, 247, 0.5)" }}
-  >
-    <Handle type="target" position={Position.Top} className="w-3 h-3" />
-    <div className="flex items-center gap-2 mb-2">
-      <Database size={20} />
-      <h3 className="font-bold">{data.label}</h3>
-    </div>
-    <p className="text-purple-100 text-xs mb-3">{data.description}</p>
+const StorageNode = ({ data }: { data: any }) => {
+  // State for controlling the TiKV node animation
+  const [nodeAnimationState, setNodeAnimationState] = useState('normal') // 'normal', 'expanding', 'expanded', 'contracting'
 
+  // Create a continuous animation cycle
+  useEffect(() => {
+    // Start the animation cycle automatically
+    const startAnimationCycle = () => {
+      const cycle = () => {
+        // Sequence: normal -> expanding -> expanded -> contracting -> normal
+        setNodeAnimationState('expanding');
+
+        setTimeout(() => {
+          setNodeAnimationState('expanded');
+
+          setTimeout(() => {
+            setNodeAnimationState('contracting');
+
+            setTimeout(() => {
+              setNodeAnimationState('normal');
+
+              // Schedule the next cycle
+              setTimeout(cycle, 3000);
+            }, 800); // Contracting duration
+          }, 2000); // Stay expanded duration
+        }, 800); // Expanding duration
+      };
+
+      // Start the first cycle
+      cycle();
+    };
+
+    // Start animation after a short delay
+    const initialDelay = setTimeout(startAnimationCycle, 2000);
+
+    return () => {
+      clearTimeout(initialDelay);
+    };
+  }, [])
+
+  // Determine if we should show the card in expanded state
+  const isExpanded = nodeAnimationState === 'expanding' || nodeAnimationState === 'expanded' || nodeAnimationState === 'contracting';
+
+  // Animation properties based on state
+  const getNodeOpacity = () => {
+    switch (nodeAnimationState) {
+      case 'expanding': return { opacity: 1 };
+      case 'expanded': return { opacity: 1 };
+      case 'contracting': return { opacity: 0.3 };
+      default: return { opacity: 0 };
+    }
+  };
+
+  return (
+  <div className="node-wrapper">
     <motion.div
-      className="mt-2 bg-purple-700/50 rounded-md p-2"
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: 'auto', opacity: 1 }}
-      transition={{ duration: 0.4, delay: 0.6 }}
+      className="px-5 py-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg text-white shadow-lg border-2 border-purple-400"
+      animate={{ width: isExpanded ? '320px' : '220px' }}
+      transition={{ duration: 0.8, type: 'spring', stiffness: 100 }}
+      whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(168, 85, 247, 0.5)" }}
     >
-      <p className="text-purple-100 text-xs font-medium mb-2">Distributed Cluster (3+ nodes)</p>
-      <div className="flex justify-around gap-1">
-        <motion.div
-          className="bg-purple-800 rounded p-1 flex flex-col items-center"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.8 }}
-        >
-          <Database size={14} className="text-purple-300" />
-          <span className="text-[10px] text-purple-300">TiKV 1</span>
-        </motion.div>
-        <motion.div
-          className="bg-purple-800 rounded p-1 flex flex-col items-center"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.9 }}
-        >
-          <Database size={14} className="text-purple-300" />
-          <span className="text-[10px] text-purple-300">TiKV 2</span>
-        </motion.div>
-        <motion.div
-          className="bg-purple-800 rounded p-1 flex flex-col items-center"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.3, delay: 1.0 }}
-        >
-          <Database size={14} className="text-purple-300" />
-          <span className="text-[10px] text-purple-300">TiKV 3</span>
-        </motion.div>
+      <Handle type="target" position={Position.Top} className="w-3 h-3" />
+      <div className="flex items-center gap-2 mb-2">
+        <Database size={20} />
+        <h3 className="font-bold">{data.label}</h3>
+      </div>
+      <p className="text-purple-100 text-xs mb-3">{data.description}</p>
+
+      <div className="mt-2 bg-purple-700/50 rounded-md p-2">
+        <p className="text-purple-100 text-xs font-medium mb-2">Distributed Cluster (3+ nodes)</p>
+
+        {/* TiKV Nodes Container */}
+        <div className={`flex ${isExpanded ? 'justify-between' : 'justify-around'} gap-1`}>
+          {/* Fixed TiKV Nodes */}
+          <div className="bg-purple-800 rounded p-1 flex flex-col items-center w-[60px]">
+            <Database size={14} className="text-purple-300" />
+            <span className="text-[10px] text-purple-300">TiKV 1</span>
+          </div>
+
+          <div className="bg-purple-800 rounded p-1 flex flex-col items-center w-[60px]">
+            <Database size={14} className="text-purple-300" />
+            <span className="text-[10px] text-purple-300">TiKV 2</span>
+          </div>
+
+          <div className="bg-purple-800 rounded p-1 flex flex-col items-center w-[60px]">
+            <Database size={14} className="text-purple-300" />
+            <span className="text-[10px] text-purple-300">TiKV 3</span>
+          </div>
+
+          {/* Dynamic TiKV Node - Always visible with changing opacity */}
+          <motion.div
+            className="bg-purple-800 rounded p-1 flex flex-col items-center w-[60px] relative"
+            animate={getNodeOpacity()}
+            transition={{ duration: 0.8 }}
+          >
+            <Database size={14} className="text-purple-300" />
+            <span className="text-[10px] text-purple-300">TiKV 4</span>
+
+            {/* Pulsing indicator only visible during expanding/expanded states */}
+            {(nodeAnimationState === 'expanding' || nodeAnimationState === 'expanded') && (
+              <motion.div
+                className="absolute -top-2 -right-2 w-4 h-4 bg-green-500 rounded-full"
+                animate={{ scale: [1, 1.5, 1] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
+              />
+            )}
+          </motion.div>
+        </div>
       </div>
     </motion.div>
-  </motion.div>
-)
+  </div>
+  )
+}
 
 const AnalyticsNode = ({ data }: { data: any }) => (
   <motion.div
@@ -252,7 +311,8 @@ const TiDBArchitectureDiagram: React.FC = () => {
       position: { x: 100, y: 400 },
       data: {
         label: 'TiKV',
-        description: 'Distributed Transactional Storage with Replication'
+        description: 'Distributed Transactional Storage with Replication',
+        animate: true
       },
     },
     {
@@ -324,7 +384,24 @@ const TiDBArchitectureDiagram: React.FC = () => {
 
   const resetAnimation = () => {
     setAnimate(false)
-    setTimeout(() => setAnimate(true), 100)
+
+    // Animation continues automatically since it's now on a loop
+    // But let's reset the TiKV animations as well
+    const updatedNodes = nodes.map(node => {
+      // Reset all nodes to trigger animations
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          animate: true
+        }
+      }
+    })
+
+    setTimeout(() => {
+      setAnimate(true)
+      setNodes(updatedNodes)
+    }, 100)
   }
 
   return (
