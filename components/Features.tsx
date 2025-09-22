@@ -204,16 +204,31 @@ const Features = React.memo(() => {
                 </button>
               </div>
               <div className="p-4">
-                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <Play size={48} className="text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Video demo for {selectedFeature?.title}
-                    </p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                      Video content coming soon...
-                    </p>
-                  </div>
+                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                  {selectedFeature?.videoUrl ? (
+                    <video
+                      className="w-full h-full object-cover"
+                      controls
+                      autoPlay
+                      muted
+                      playsInline
+                    >
+                      <source src={selectedFeature.videoUrl} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <Play size={48} className="text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-500 dark:text-gray-400">
+                          Video demo for {selectedFeature?.title}
+                        </p>
+                        <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                          Video content coming soon...
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

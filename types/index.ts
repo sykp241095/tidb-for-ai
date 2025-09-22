@@ -5,6 +5,7 @@ export interface Feature {
   details: string[]
   color: string
   code: string
+  videoUrl?: string
 }
 
 export interface UseCase {
