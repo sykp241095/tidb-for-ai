@@ -11,6 +11,8 @@ const Features = React.memo(() => {
   const { copied: codeCopied, copyToClipboard } = useClipboard()
   const [showVideoModal, setShowVideoModal] = useState(false)
   const [selectedFeature, setSelectedFeature] = useState<typeof features[0] | null>(null)
+  const [videoLoading, setVideoLoading] = useState(false)
+  const [videoError, setVideoError] = useState(false)
 
   React.useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -25,6 +27,8 @@ const Features = React.memo(() => {
 
   const handleWatchVideo = useCallback((feature: typeof features[0]) => {
     setSelectedFeature(feature)
+    setVideoLoading(true)
+    setVideoError(false)
     setShowVideoModal(true)
   }, [])
 
@@ -204,18 +208,36 @@ const Features = React.memo(() => {
                 </button>
               </div>
               <div className="p-4">
-                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-                  {selectedFeature?.videoUrl ? (
-                    <video
-                      className="w-full h-full object-cover"
-                      controls
-                      autoPlay
-                      muted
-                      playsInline
-                    >
-                      <source src={selectedFeature.videoUrl} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
+                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative">
+                  {selectedFeature?.videoUrl && !videoError ? (
+                    <>
+                      <video
+                        className="w-full h-full object-cover"
+                        controls
+                        muted
+                        playsInline
+                        preload="metadata"
+                        onLoadStart={() => setVideoLoading(true)}
+                        onCanPlay={() => setVideoLoading(false)}
+                        onLoadedData={() => setVideoLoading(false)}
+                        onError={(e) => {
+                          console.error('Video failed to load:', selectedFeature.videoUrl)
+                          setVideoError(true)
+                          setVideoLoading(false)
+                        }}
+                      >
+                        <source src={selectedFeature.videoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                      {videoLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                          <div className="text-center">
+                            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <p className="text-gray-500 dark:text-gray-400">Loading video...</p>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-center">
@@ -224,8 +246,19 @@ const Features = React.memo(() => {
                           Video demo for {selectedFeature?.title}
                         </p>
                         <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                          Video content coming soon...
+                          {videoError ? 'Video failed to load. Please try again later.' : 'Video content coming soon...'}
                         </p>
+                        {videoError && (
+                          <button
+                            onClick={() => {
+                              setVideoError(false)
+                              setVideoLoading(true)
+                            }}
+                            className="mt-3 px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                          >
+                            Retry
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
