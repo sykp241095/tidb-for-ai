@@ -105,15 +105,25 @@ Configure automatic embedding generation with OpenAI embeddings - vectors are au
 Use the search API to combine vector and full-text search with fusion methods:
 
 ```python
-query = (
-    table.search(query_text, search_type=search_type)
-    .distance_threshold(distance_threshold)
-    .fusion(method=fusion_method)
-)
+# Perform hybrid search with different search types
+def hybrid_search(query_text, search_type="hybrid", limit=5):
+    query = (
+        table.search(query_text, search_type=search_type)
+        .distance_threshold(0.8)
+        .fusion(method="rrf")  # Reciprocal Rank Fusion
+        .limit(limit)
+    )
 
-query = query.rerank(reranker, "text")
+    return query.to_pandas()
 
-df = query.limit(limit).to_pandas()
+# Example: Vector search only
+vector_results = hybrid_search("database performance", search_type="vector")
+
+# Example: Full-text search only
+fulltext_results = hybrid_search("TiDB distributed", search_type="fulltext")
+
+# Example: Hybrid search (combines both)
+hybrid_results = hybrid_search("TiDB performance optimization", search_type="hybrid")
 ```
 
 ### 4. Results
