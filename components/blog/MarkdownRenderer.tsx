@@ -18,7 +18,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`prose prose-lg dark:prose-invert max-w-none ${className}`}>
+    <div className={`prose prose-lg dark:prose-invert max-w-none text-gray-900 dark:text-gray-100 ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight, rehypeRaw]}
@@ -50,24 +50,22 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             const hasAlign = (props as { align?: string }).align
             if (hasAlign) {
               return (
-                <div className={`mb-4 leading-relaxed text-gray-700 dark:text-gray-300 text-${hasAlign}`}>
+                <div className={`mb-4 leading-relaxed text-gray-900 dark:text-gray-100 text-${hasAlign}`}>
                   {children}
                 </div>
               )
             }
             return (
-              <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props}>
+              <p className="mb-4 leading-relaxed text-gray-900 dark:text-gray-100" {...props}>
                 {children}
               </p>
             )
           },
           // Custom code block styling
           pre: ({ children, ...props }) => (
-            <div className="relative">
-              <pre className="bg-gray-900 rounded-lg p-4 overflow-x-auto text-sm border border-gray-700" {...props}>
-                {children}
-              </pre>
-            </div>
+            <pre className="bg-gray-50 dark:bg-gray-800 p-4 rounded border shadow-sm my-6" {...props}>
+              {children}
+            </pre>
           ),
           // Inline code styling
           code: ({ children, className, ...props }) => {
@@ -75,7 +73,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
             if (isInline) {
               return (
-                <code className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                <code className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
                   {children}
                 </code>
               )
@@ -118,12 +116,12 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           ),
           // Custom list styling
           ul: ({ children, ...props }) => (
-            <ul className="list-disc pl-6 mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props}>
+            <ul className="list-disc pl-6 mb-4 space-y-2 text-gray-900 dark:text-gray-100" {...props}>
               {children}
             </ul>
           ),
           ol: ({ children, ...props }) => (
-            <ol className="list-decimal pl-6 mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props}>
+            <ol className="list-decimal pl-6 mb-4 space-y-2 text-gray-900 dark:text-gray-100" {...props}>
               {children}
             </ol>
           ),
