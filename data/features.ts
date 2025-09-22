@@ -13,7 +13,7 @@ export const features: Feature[] = [
       'OpenAI embeddings integration'
     ],
     color: 'from-blue-500 to-blue-600',
-    videoUrl: '/content/videos/vector-search.mp4',
+    videoUrl: '/videos/vector-search.mp4',
     code: `# Define table schema
 class Chunk(TableModel):
     __tablename__ = "chunks"
@@ -51,7 +51,7 @@ print(f"Found {len(results)} similar results")`
       'Visual content understanding'
     ],
     color: 'from-green-500 to-green-600',
-    videoUrl: '/content/videos/image-search.mp4',
+    videoUrl: '/videos/image-search.mp4',
     code: `# Multimodal search with CLIP
 import tidb_vector as tv
 import clip
@@ -91,7 +91,7 @@ for content_type, desc, similarity in results:
       'Multi-criteria relevance ranking'
     ],
     color: 'from-purple-500 to-purple-600',
-    videoUrl: '/content/videos/hybrid-search.mp4',
+    videoUrl: '/videos/hybrid-search.mp4',
     code: `# Hybrid search combining vector + full-text
 import tidb_vector as tv
 from openai import OpenAI
@@ -181,7 +181,7 @@ for name, price, rating, similarity in results:
       'Zero-maintenance vector search'
     ],
     color: 'from-pink-500 to-pink-600',
-    videoUrl: '/content/videos/auto-embedding.mp4',
+    videoUrl: '/videos/auto-embedding.mp4',
     code: `# Auto-embedding with TiDB built-in functions
 import tidb_vector as tv
 
