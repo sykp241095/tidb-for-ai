@@ -124,17 +124,6 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               document.body.removeChild(textArea)
             }
 
-            const getLanguageIcon = (lang: string) => {
-              switch (lang) {
-                case 'python': return '🐍'
-                case 'javascript': case 'js': return '📜'
-                case 'typescript': case 'ts': return '📘'
-                case 'bash': case 'shell': case 'terminal': return '💻'
-                case 'sql': return '🗄️'
-                case 'json': return '📋'
-                default: return '📄'
-              }
-            }
 
             return (
               <div className="my-6 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
