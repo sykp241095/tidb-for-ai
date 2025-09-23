@@ -68,6 +68,7 @@ export interface Feature {
   color: string
   code: string
   videoUrl?: string
+  codeUrl?: string
   tags?: string[]
 }
 

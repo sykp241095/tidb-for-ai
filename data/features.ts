@@ -1,4 +1,4 @@
-import { Search, Image, Layers, Filter, Sparkles, Zap, Shield } from 'lucide-react'
+import { Search, Image, Layers, Sparkles, Zap, Shield } from 'lucide-react'
 import { Feature, AdditionalFeature } from '@/types'
 
 export const features: Feature[] = [
@@ -14,10 +14,9 @@ export const features: Feature[] = [
     ],
     color: 'from-blue-500 to-blue-600',
     videoUrl: '/videos/vector-search.mp4',
-    code: `# Define table schema
-class Chunk(TableModel):
+    codeUrl: 'https://github.com/pingcap/pytidb/tree/main/examples/vector_search',
+    code: `class Chunk(TableModel):
     __tablename__ = "chunks"
-    __table_args__ = {"extend_existing": True}
 
     id: int = Field(primary_key=True)
     text: str = Field()
@@ -26,19 +25,16 @@ class Chunk(TableModel):
     )
     meta: dict = Field(sa_type=JSON)
 
-# Vector search with filtering
-df = (
+table = db.create_table(schema=Chunk, if_exists="overwrite")
+
+results = (
     table.search(query_text)
+    .debug(True)
     .filter({"meta.language": language})
     .distance_threshold(distance_threshold)
-    .debug(True)
     .limit(query_limit)
-    .to_pandas()
-)
-
-# Example usage
-results = table.search("slow application performance")
-print(f"Found {len(results)} similar results")`
+    .to_list()
+)`
   },
   {
     icon: Image,
@@ -52,33 +48,26 @@ print(f"Found {len(results)} similar results")`
     ],
     color: 'from-green-500 to-green-600',
     videoUrl: '/videos/image-search.mp4',
-    code: `# Multimodal search with CLIP
-import tidb_vector as tv
-import clip
-import torch
+    codeUrl: 'https://github.com/pingcap/pytidb/tree/main/examples/image_search',
+    code: `class Pet(TableModel):
+    __tablename__ = "pets"
 
-# Load CLIP model and connect to TiDB
-model, preprocess = clip.load("ViT-B/32")
-client = tv.connect("mysql://user:pass@host:4000/db")
+    id: int = Field(primary_key=True)
+    breed: str = Field()
+    image_uri: str = Field()
+    image_name: str = Field()
+    image_vec: Optional[List[float]] = embed_fn.VectorField(
+        distance_metric=DistanceMetric.L2,
+        source_field="image_uri",
+        source_type="image",
+    )
 
-def multimodal_search(query, limit=5):
-    # Get CLIP embedding for text query
-    with torch.no_grad():
-        text_tokens = clip.tokenize([query])
-        query_embedding = model.encode_text(text_tokens)[0].tolist()
-
-    # Search across images and text
-    return client.execute("""
-        SELECT content_type, description,
-               VEC_COSINE_DISTANCE(clip_embedding, %s) as similarity
-        FROM multimodal_content
-        ORDER BY similarity ASC LIMIT %s
-    """, (query_embedding, limit))
-
-# Example usage
-results = multimodal_search("mountain landscape")
-for content_type, desc, similarity in results:
-    print(f"{content_type}: {similarity:.3f}")`
+results = (
+    table.search(query="fluffy orange cat")
+    .distance_metric(DistanceMetric.L2)
+    .limit(limit)
+    .to_list()
+)`
   },
   {
     icon: Layers,
@@ -92,83 +81,24 @@ for content_type, desc, similarity in results:
     ],
     color: 'from-purple-500 to-purple-600',
     videoUrl: '/videos/hybrid-search.mp4',
-    code: `# Hybrid search combining vector + full-text
-import tidb_vector as tv
-from openai import OpenAI
+    codeUrl: 'https://github.com/pingcap/pytidb/tree/main/examples/hybrid_search',
+    code: `# Define table schema
+class Document(TableModel):
+    __tablename__ = "documents"
 
-client = tv.connect("mysql://user:pass@host:4000/db")
-openai_client = OpenAI()
+    id: int = Field(primary_key=True)
+    text: str = FullTextField()
+    text_vec: list[float] = embed_fn.VectorField(
+        source_field="text",
+    )
+    meta: dict = Field(sa_type=JSON)
 
-def hybrid_search(query, limit=10):
-    # Get vector embedding
-    query_embedding = openai_client.embeddings.create(
-        model="text-embedding-3-small", input=query
-    ).data[0].embedding
-
-    # Combined vector + full-text search
-    return client.execute("""
-        SELECT title, content,
-               (1 - VEC_COSINE_DISTANCE(embedding, %s)) * 0.7 +
-               MATCH(title, content) AGAINST (%s) * 0.3 as score
-        FROM hybrid_documents
-        WHERE VEC_COSINE_DISTANCE(embedding, %s) < 0.8
-           OR MATCH(title, content) AGAINST (%s) > 0
-        ORDER BY score DESC LIMIT %s
-    """, (query_embedding, query, query_embedding, query, limit))
-
-# Example usage
-results = hybrid_search("machine learning algorithms")
-for title, content, score in results:
-    print(f"{title}: {score:.3f}")`
-  },
-  {
-    icon: Filter,
-    title: 'Enhanced Filtering',
-    description: 'Advanced filtering with real-time updates.',
-    details: [
-      'Multi-dimensional filtering',
-      'Dynamic filter combinations',
-      'Real-time filter updates',
-      'Performance-optimized queries'
-    ],
-    color: 'from-orange-500 to-orange-600',
-    code: `# Enhanced filtering with semantic search
-import tidb_vector as tv
-from openai import OpenAI
-
-client = tv.connect("mysql://user:pass@host:4000/db")
-openai_client = OpenAI()
-
-def search_products(query, filters=None, limit=10):
-    # Get semantic embedding
-    query_embedding = openai_client.embeddings.create(
-        model="text-embedding-3-small", input=query
-    ).data[0].embedding
-
-    # Build filtered query
-    conditions = ["VEC_COSINE_DISTANCE(description_embedding, %s) < 0.7"]
-    params = [query_embedding]
-
-    if filters:
-        if 'price_min' in filters:
-            conditions.append("price >= %s")
-            params.append(filters['price_min'])
-        if 'category' in filters:
-            conditions.append("category = %s")
-            params.append(filters['category'])
-
-    return client.execute(f"""
-        SELECT name, price, rating,
-               VEC_COSINE_DISTANCE(description_embedding, %s) as similarity
-        FROM products
-        WHERE {' AND '.join(conditions)}
-        ORDER BY similarity ASC LIMIT %s
-    """, [query_embedding] + params + [limit])
-
-# Example usage
-results = search_products("running shoes", {'price_min': 50})
-for name, price, rating, similarity in results:
-    print(f"{name}: {price} ({similarity:.3f})")`
+query = (
+    table.search(query_text, search_type="hybrid")
+    .distance_threshold(0.8)
+    .fusion(method="rrf")
+    .limit(limit)
+)`
   },
   {
     icon: Sparkles,
@@ -182,43 +112,28 @@ for name, price, rating, similarity in results:
     ],
     color: 'from-pink-500 to-pink-600',
     videoUrl: '/videos/auto-embedding.mp4',
-    code: `# Auto-embedding with TiDB built-in functions
-import tidb_vector as tv
+    codeUrl: 'https://github.com/pingcap/pytidb/tree/main/examples/auto_embedding',
+    code: `# Define embedding function
+embed_func = EmbeddingFunction(
+    model_name="tidbcloud_free/amazon/titan-embed-text-v2"
+    # No API key required for TiDB Cloud free models
+)
 
-client = tv.connect("mysql://user:pass@host:4000/db")
+class Chunk(TableModel):
+    __tablename__ = "chunks"
 
-# Create table with auto-generated embeddings
-client.execute("""
-    CREATE TABLE auto_embedded_content (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(500),
-        content TEXT,
-        -- Auto-generated embedding column
-        content_embedding VECTOR(1536)
-            GENERATED ALWAYS AS (VEC_FROM_TEXT(CONCAT(title, ' ', content)))
-            STORED COMMENT 'hnsw(distance=cosine)'
-    )
-""")
+    id: int = Field(primary_key=True)
+    text: str = Field(sa_type=TEXT)
+    text_vec: list[float] = embed_func.VectorField(source_field="text")
 
-# Insert content - embeddings generated automatically
-client.execute("""
-    INSERT INTO auto_embedded_content (title, content)
-    VALUES (%s, %s)
-""", ("Vector Database Guide", "Learn about vector search"))
+table = db.create_table(schema=Chunk, if_exists="overwrite")
 
-# Search using auto-generated embeddings
-def auto_search(query, limit=5):
-    return client.execute("""
-        SELECT title, content,
-               VEC_COSINE_DISTANCE(content_embedding, VEC_FROM_TEXT(%s)) as similarity
-        FROM auto_embedded_content
-        ORDER BY similarity ASC LIMIT %s
-    """, (query, limit))
-
-# Example usage
-results = auto_search("vector search tutorial")
-for title, content, similarity in results:
-    print(f"{title}: {similarity:.3f}")`
+# Insert sample data - embeddings generated automatically
+table.bulk_insert([
+    Chunk(text="TiDB is a distributed database that supports OLTP, OLAP, HTAP and AI workloads."),
+    Chunk(text="PyTiDB is a Python library for developers to connect to TiDB."),
+    Chunk(text="LlamaIndex is a Python library for building AI-powered applications."),
+])`
   }
 ]
 

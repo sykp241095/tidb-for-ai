@@ -97,13 +97,26 @@ const Features = React.memo(() => {
 
                     {/* Column 3: Buttons */}
                     <div className="col-span-3 flex flex-col gap-2 justify-center items-end">
-                      <button
-                        onClick={() => handleSetActiveFeature(index)}
-                        className="flex items-center justify-center gap-1.5 w-20 h-8 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors"
-                      >
-                        <Code2 size={16} />
-                        Code
-                      </button>
+                      {feature.codeUrl ? (
+                        <a
+                          href={feature.codeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center justify-center gap-1.5 w-20 h-8 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors"
+                        >
+                          <Code2 size={16} />
+                          Code
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => handleSetActiveFeature(index)}
+                          className="flex items-center justify-center gap-1.5 w-20 h-8 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors"
+                        >
+                          <Code2 size={16} />
+                          Code
+                        </button>
+                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
