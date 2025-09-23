@@ -23,6 +23,11 @@ Hybrid search merges two powerful search techniques:
 
 This approach ensures you never miss relevant results, whether users search with natural language or specific keywords.
 
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/6e1c639d-2160-44c8-86b4-958913b9eca5" alt="TiDB Hybrid Search Demo" width="700"/>
+    <p align="center"><i>TiDB Hybrid Search Demo</i></p>
+</p>
+
 ## Prerequisites
 
 Before starting, ensure you have:
