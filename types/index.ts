@@ -1,67 +1,30 @@
-export interface Feature {
-  icon: React.ComponentType<any>
-  title: string
-  description: string
-  details: string[]
-  color: string
-  code: string
-  videoUrl?: string
-}
+// Re-export organized types
+export * from './api'
+export * from './components'
 
-export interface UseCase {
-  title: string
-  description: string
-  tier: string
-  tierColor: string
-  tags: string[]
-  cta: string
-  icon: string
-  featured?: boolean
-}
+// Legacy exports for backward compatibility
+export type {
+  Feature,
+  UseCase,
+  CustomerStory,
+  AdditionalFeature,
+  NavigationItem,
+  FooterSection
+} from './api'
 
-export interface CustomerStory {
-  company: string
-  title: string
-  description: string
-  logo: string
-  impact: string
-}
+export type {
+  ButtonProps,
+  CardProps,
+  IconComponent,
+  LoadingState,
+  AnimationProps
+} from './components'
 
-export interface AdditionalFeature {
-  icon: React.ComponentType<any>
-  title: string
-  description: string
-  code?: string
-}
-
-export interface NavigationItem {
-  href: string
-  label: string
-  external?: boolean
-}
-
-export interface FooterSection {
-  title: string
-  links: NavigationItem[]
-}
-
+// Utility types
 export interface SocialLink {
   href: string
   icon: React.ComponentType<any>
   label: string
-}
-
-export interface ButtonVariant {
-  variant: 'primary' | 'secondary' | 'outline'
-  size?: 'sm' | 'md' | 'lg'
-  className?: string
-}
-
-export interface CardProps {
-  className?: string
-  children: React.ReactNode
-  onClick?: () => void
-  active?: boolean
 }
 
 export interface CodeBlockProps {
@@ -70,4 +33,13 @@ export interface CodeBlockProps {
   filename?: string
   onCopy?: () => void
   copied?: boolean
+  showLineNumbers?: boolean
+  maxHeight?: string
+}
+
+// Legacy ButtonVariant interface for backward compatibility
+export interface ButtonVariant {
+  variant?: 'primary' | 'secondary' | 'outline'
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
 }

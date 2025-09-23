@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { ArrowRight, ExternalLink, Github, Star, Users, Calendar } from 'lucide-react'
-import Navigation from '@/components/Navigation'
-import Footer from '@/components/Footer'
+import { Navigation, Footer } from '@/components/layout'
 
 const categories = [
   'All',

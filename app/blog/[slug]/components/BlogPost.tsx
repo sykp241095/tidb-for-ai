@@ -7,8 +7,7 @@ import { BlogPost as BlogPostType, BlogSummary } from '@/types/blog'
 import MarkdownRenderer from '@/components/blog/MarkdownRenderer'
 import RelatedArticles from '@/components/blog/RelatedArticles'
 import { Button, Badge, Section } from '@/components/ui'
-import Navigation from '@/components/Navigation'
-import Footer from '@/components/Footer'
+import { Navigation, Footer } from '@/components/layout'
 
 interface BlogPostProps {
   post: BlogPostType

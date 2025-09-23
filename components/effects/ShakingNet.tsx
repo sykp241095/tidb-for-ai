@@ -68,7 +68,7 @@ const ShakingNet: React.FC<ShakingNetProps> = ({
     }
 
     ctx.stroke()
-  }, [shakeIntensity, strokeStyle])
+  }, [shakeIntensity])
 
   useEffect(() => {
     const canvas = canvasRef.current

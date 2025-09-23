@@ -5,8 +5,7 @@ import { Filter, X } from 'lucide-react'
 import { BlogSummary } from '@/types/blog'
 import BlogCard from '@/components/blog/BlogCard'
 import { Section, Button, Badge } from '@/components/ui'
-import Navigation from '@/components/Navigation'
-import Footer from '@/components/Footer'
+import { Navigation, Footer } from '@/components/layout'
 
 interface BlogListingProps {
   posts: BlogSummary[]
