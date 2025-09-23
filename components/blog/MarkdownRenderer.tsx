@@ -158,7 +158,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
                   className={`overflow-x-auto text-sm leading-relaxed ${
                     isTerminal
                       ? 'bg-gray-900 text-green-400 p-4'
-                      : 'bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4'
+                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-200 p-4'
                   }`}
                   {...props}
                 >
@@ -173,7 +173,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
             if (isInline) {
               return (
-                <code className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                <code className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
                   {children}
                 </code>
               )
