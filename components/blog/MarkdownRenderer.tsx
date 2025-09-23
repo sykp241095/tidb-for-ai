@@ -62,11 +62,71 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             )
           },
           // Custom code block styling
-          pre: ({ children, ...props }) => (
-            <pre className="bg-gray-50 dark:bg-gray-800 p-4 rounded border shadow-sm my-6" {...props}>
-              {children}
-            </pre>
-          ),
+          pre: ({ children, ...props }) => {
+            const codeElement = React.Children.toArray(children).find(
+              (child): child is React.ReactElement =>
+                React.isValidElement(child) && child.type === 'code'
+            )
+
+            const language = codeElement?.props?.className?.replace('language-', '') || ''
+            const isTerminal = language === 'bash' || language === 'shell' || language === 'terminal'
+
+            const getLanguageIcon = (lang: string) => {
+              switch (lang) {
+                case 'python': return '🐍'
+                case 'javascript': case 'js': return '📜'
+                case 'typescript': case 'ts': return '📘'
+                case 'bash': case 'shell': case 'terminal': return '💻'
+                case 'sql': return '🗄️'
+                case 'json': return '📋'
+                default: return '📄'
+              }
+            }
+
+            return (
+              <div className="my-6 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                {/* Header bar */}
+                <div className={`flex items-center justify-between px-4 py-2 text-sm font-medium ${
+                  isTerminal
+                    ? 'bg-gray-900 text-green-400 border-b border-gray-700'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {/* Traffic light buttons */}
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <span className="ml-2 flex items-center gap-1">
+                      {getLanguageIcon(language)}
+                      {isTerminal ? 'Terminal' : (language || 'Code')}
+                    </span>
+                  </div>
+                  <button
+                    className="opacity-60 hover:opacity-100 transition-opacity text-xs"
+                    onClick={() => {
+                      const code = codeElement?.props?.children
+                      if (typeof code === 'string') {
+                        navigator.clipboard.writeText(code)
+                      }
+                    }}
+                  >
+                    Copy
+                  </button>
+                </div>
+
+                {/* Code content */}
+                <pre className={`overflow-x-auto text-sm leading-relaxed ${
+                  isTerminal
+                    ? 'bg-gray-900 text-green-400 p-4'
+                    : 'bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4'
+                }`} {...props}>
+                  {children}
+                </pre>
+              </div>
+            )
+          },
           // Inline code styling
           code: ({ children, className, ...props }) => {
             const isInline = !className?.includes('language-')
