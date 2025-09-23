@@ -1,42 +1,63 @@
 import React from 'react'
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from '@/lib/utils/cn'
 
-interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  className?: string
-  color?: 'primary' | 'secondary' | 'current'
+const spinnerVariants = cva(
+  "animate-spin rounded-full border-2 border-transparent border-t-current",
+  {
+    variants: {
+      size: {
+        xs: "w-3 h-3",
+        sm: "w-4 h-4",
+        md: "w-6 h-6",
+        lg: "w-8 h-8",
+        xl: "w-12 h-12",
+      },
+      colorScheme: {
+        primary: "text-black dark:text-white",
+        secondary: "text-gray-600 dark:text-gray-400",
+        accent: "text-blue-600 dark:text-blue-400",
+        success: "text-green-600 dark:text-green-400",
+        warning: "text-yellow-600 dark:text-yellow-400",
+        danger: "text-red-600 dark:text-red-400",
+        current: "text-current",
+      },
+      variant: {
+        default: "border-2",
+        thick: "border-4",
+        thin: "border-[1px]",
+      }
+    },
+    defaultVariants: {
+      size: "md",
+      colorScheme: "primary",
+      variant: "default",
+    },
+  }
+)
+
+interface LoadingSpinnerProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof spinnerVariants> {
+  label?: string
 }
 
-const sizeClasses = {
-  sm: 'w-4 h-4',
-  md: 'w-6 h-6',
-  lg: 'w-8 h-8',
-  xl: 'w-12 h-12',
-} as const
-
-const colorClasses = {
-  primary: 'text-black dark:text-white',
-  secondary: 'text-gray-600 dark:text-gray-400',
-  current: 'text-current',
-} as const
-
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  size = 'md',
+  size,
+  colorScheme,
+  variant,
   className,
-  color = 'primary'
+  label = "Loading...",
+  ...props
 }) => {
   return (
     <div
-      className={cn(
-        'animate-spin rounded-full border-2 border-transparent border-t-current',
-        sizeClasses[size],
-        colorClasses[color],
-        className
-      )}
+      className={cn(spinnerVariants({ size, colorScheme, variant, className }))}
       role="status"
-      aria-label="Loading"
+      aria-label={label}
+      {...props}
     >
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">{label}</span>
     </div>
   )
 }

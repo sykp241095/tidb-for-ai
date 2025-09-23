@@ -1,17 +1,16 @@
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
 /**
- * Utility function to conditionally join class names
- * Similar to clsx but simplified for this project's needs
+ * Utility function to conditionally join class names with proper Tailwind merging
+ * Combines clsx for conditional classes and tailwind-merge for proper Tailwind conflict resolution
  */
-export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes
-    .filter(Boolean)
-    .join(' ')
-    .trim()
-    .replace(/\s+/g, ' ')
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs))
 }
 
 /**
- * Utility to create consistent CSS class combinations
+ * Utility to create consistent CSS class combinations with proper Tailwind merging
  */
 export function createVariantClasses<T extends Record<string, string>>(
   base: string,
@@ -25,10 +24,8 @@ export function createVariantClasses<T extends Record<string, string>>(
 
 /**
  * Utility to merge Tailwind classes, giving precedence to later classes
+ * Now using tailwind-merge for proper conflict resolution
  */
 export function mergeTailwindClasses(base: string, override?: string): string {
-  if (!override) return base
-
-  // Simple merge - for more complex merging, consider using tailwind-merge
   return cn(base, override)
 }

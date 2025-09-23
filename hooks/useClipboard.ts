@@ -1,58 +1,64 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
+// Enhanced clipboard hook using modern browser APIs with fallbacks
 export const useClipboard = (resetTime = 2000) => {
   const [copied, setCopied] = useState(false)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const copyToClipboard = useCallback(async (text: string) => {
-    // Check if clipboard API is available
-    if (!navigator?.clipboard) {
-      // Fallback for older browsers
-      try {
+    if (!isClient) {
+      return false
+    }
+
+    try {
+      // Modern clipboard API
+      if (typeof navigator !== 'undefined' && navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text)
+      } else if (typeof document !== 'undefined') {
+        // Fallback for older browsers or non-secure contexts
         const textArea = document.createElement('textarea')
         textArea.value = text
-        textArea.style.position = 'fixed'
+        textArea.style.position = 'absolute'
         textArea.style.left = '-999999px'
         textArea.style.top = '-999999px'
         document.body.appendChild(textArea)
         textArea.focus()
         textArea.select()
-        const success = document.execCommand('copy')
+
+        const successful = document.execCommand('copy')
         document.body.removeChild(textArea)
 
-        if (success) {
-          setCopied(true)
-          if (timeoutRef.current) clearTimeout(timeoutRef.current)
-          timeoutRef.current = setTimeout(() => setCopied(false), resetTime)
-          return true
+        if (!successful) {
+          throw new Error('Copy command was unsuccessful')
         }
-        return false
-      } catch (err) {
-        // Silent fallback failure
-        return false
+      } else {
+        throw new Error('Clipboard not supported')
       }
-    }
 
-    try {
-      await navigator.clipboard.writeText(text)
       setCopied(true)
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      timeoutRef.current = setTimeout(() => setCopied(false), resetTime)
+      setTimeout(() => {
+        setCopied(false)
+      }, resetTime)
+
       return true
     } catch (err) {
-      // Silent failure for better UX
+      console.error('Failed to copy text:', err)
       return false
     }
-  }, [resetTime])
+  }, [resetTime, isClient])
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
+  const isSupported = isClient &&
+    (typeof navigator !== 'undefined' && navigator.clipboard) ||
+    (typeof document !== 'undefined' && document.execCommand)
 
-  return { copied, copyToClipboard }
+  return {
+    copied,
+    copyToClipboard,
+    isSupported
+  }
 }
