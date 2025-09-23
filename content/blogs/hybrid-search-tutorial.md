@@ -1,5 +1,5 @@
 ---
-title: "Hybrid Search: Combining Vector and Full-text Search"
+title: "Tutorial: Hybrid Search - Combining Vector and Full-text Search"
 description: "Learn how to build powerful hybrid search applications that combine vector similarity with traditional full-text search for comprehensive results."
 date: "2024-03-15"
 publishedAt: "2024-03-15"
