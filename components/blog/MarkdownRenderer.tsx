@@ -100,7 +100,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
                     </div>
                     <span className="ml-2 flex items-center gap-1">
                       {getLanguageIcon(language)}
-                      {isTerminal ? 'Terminal' : (language || 'Code')}
+                      {isTerminal ? 'Terminal' : language}
                     </span>
                   </div>
                   <button
