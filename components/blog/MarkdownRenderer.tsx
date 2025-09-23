@@ -13,6 +13,112 @@ interface MarkdownRendererProps {
   className?: string
 }
 
+const CodeBlock = ({ children, ...props }: any) => {
+  const preRef = React.useRef<HTMLPreElement>(null)
+  const [copied, setCopied] = React.useState(false)
+
+  const codeElement = React.Children.toArray(children).find(
+    (child): child is React.ReactElement =>
+      React.isValidElement(child) && child.type === 'code'
+  )
+
+  const language = codeElement?.props?.className?.replace('language-', '') || ''
+  const isTerminal = language === 'bash' || language === 'shell' || language === 'terminal'
+
+  const showCopySuccess = () => {
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const copyToClipboard = () => {
+    const codeText = preRef.current?.textContent || ''
+
+    if (codeText) {
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(codeText).then(() => {
+          console.log('Code copied successfully!')
+          showCopySuccess()
+        }).catch(err => {
+          console.error('Clipboard API failed:', err)
+          fallbackCopy(codeText)
+        })
+      } else {
+        fallbackCopy(codeText)
+      }
+    } else {
+      console.log('No code text found to copy')
+    }
+  }
+
+  const fallbackCopy = (text: string) => {
+    // Fallback method for older browsers
+    const textArea = document.createElement('textarea')
+    textArea.value = text
+    textArea.style.position = 'fixed'
+    textArea.style.opacity = '0'
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+
+    try {
+      const successful = document.execCommand('copy')
+      if (successful) {
+        console.log('Code copied using fallback method!')
+        showCopySuccess()
+      } else {
+        console.error('Fallback copy failed')
+      }
+    } catch (err) {
+      console.error('Copy command failed:', err)
+    }
+
+    document.body.removeChild(textArea)
+  }
+
+  return (
+    <div className="my-6 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+      {/* Header bar */}
+      <div className={`flex items-center justify-between px-4 py-2 text-sm font-medium ${
+        isTerminal
+          ? 'bg-gray-900 text-green-400 border-b border-gray-700'
+          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700'
+      }`}>
+        <div className="flex items-center gap-2">
+          {/* Traffic light buttons */}
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          </div>
+          <span className="ml-2">
+            {isTerminal ? 'Terminal' : language}
+          </span>
+        </div>
+        <button
+          className="opacity-60 hover:opacity-100 transition-opacity text-xs"
+          onClick={copyToClipboard}
+        >
+          {copied ? '✓ Copied!' : 'Copy'}
+        </button>
+      </div>
+
+      {/* Code content */}
+      <pre
+        ref={preRef}
+        className={`overflow-x-auto text-sm leading-relaxed ${
+          isTerminal
+            ? 'bg-gray-900 text-green-400 p-4'
+            : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-200 p-4'
+        }`}
+        {...props}
+      >
+        {children}
+      </pre>
+    </div>
+  )
+}
+
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   content,
   className = ''
@@ -62,111 +168,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             )
           },
           // Custom code block styling
-          pre: ({ children, ...props }) => {
-            const preRef = React.useRef<HTMLPreElement>(null)
-            const [copied, setCopied] = React.useState(false)
-            const codeElement = React.Children.toArray(children).find(
-              (child): child is React.ReactElement =>
-                React.isValidElement(child) && child.type === 'code'
-            )
-
-            const language = codeElement?.props?.className?.replace('language-', '') || ''
-            const isTerminal = language === 'bash' || language === 'shell' || language === 'terminal'
-
-            const showCopySuccess = () => {
-              setCopied(true)
-              setTimeout(() => setCopied(false), 2000)
-            }
-
-            const copyToClipboard = () => {
-              const codeText = preRef.current?.textContent || ''
-
-              if (codeText) {
-                // Try modern clipboard API first
-                if (navigator.clipboard && window.isSecureContext) {
-                  navigator.clipboard.writeText(codeText).then(() => {
-                    console.log('Code copied successfully!')
-                    showCopySuccess()
-                  }).catch(err => {
-                    console.error('Clipboard API failed:', err)
-                    fallbackCopy(codeText)
-                  })
-                } else {
-                  fallbackCopy(codeText)
-                }
-              } else {
-                console.log('No code text found to copy')
-              }
-            }
-
-            const fallbackCopy = (text: string) => {
-              // Fallback method for older browsers
-              const textArea = document.createElement('textarea')
-              textArea.value = text
-              textArea.style.position = 'fixed'
-              textArea.style.opacity = '0'
-              document.body.appendChild(textArea)
-              textArea.focus()
-              textArea.select()
-
-              try {
-                const successful = document.execCommand('copy')
-                if (successful) {
-                  console.log('Code copied using fallback method!')
-                  showCopySuccess()
-                } else {
-                  console.error('Fallback copy failed')
-                }
-              } catch (err) {
-                console.error('Copy command failed:', err)
-              }
-
-              document.body.removeChild(textArea)
-            }
-
-
-            return (
-              <div className="my-6 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-                {/* Header bar */}
-                <div className={`flex items-center justify-between px-4 py-2 text-sm font-medium ${
-                  isTerminal
-                    ? 'bg-gray-900 text-green-400 border-b border-gray-700'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700'
-                }`}>
-                  <div className="flex items-center gap-2">
-                    {/* Traffic light buttons */}
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    </div>
-                    <span className="ml-2">
-                      {isTerminal ? 'Terminal' : language}
-                    </span>
-                  </div>
-                  <button
-                    className="opacity-60 hover:opacity-100 transition-opacity text-xs"
-                    onClick={copyToClipboard}
-                  >
-                    {copied ? '✓ Copied!' : 'Copy'}
-                  </button>
-                </div>
-
-                {/* Code content */}
-                <pre
-                  ref={preRef}
-                  className={`overflow-x-auto text-sm leading-relaxed ${
-                    isTerminal
-                      ? 'bg-gray-900 text-green-400 p-4'
-                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-200 p-4'
-                  }`}
-                  {...props}
-                >
-                  {children}
-                </pre>
-              </div>
-            )
-          },
+          pre: CodeBlock,
           // Inline code styling
           code: ({ children, className, ...props }) => {
             const isInline = !className?.includes('language-')
