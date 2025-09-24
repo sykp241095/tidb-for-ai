@@ -23,9 +23,8 @@ export const navigationItems: NavigationItem[] = [
     label: 'Blog'
   },
   {
-    href: 'https://pingcap.github.io/ai/',
-    label: 'Docs',
-    external: true
+    href: '/docs-new/introduction',
+    label: 'Docs'
   }
 ]
 
@@ -43,9 +42,9 @@ export const footerSections: FooterSection[] = [
   {
     title: 'Developers',
     links: [
-      { href: '#', label: 'Documentation' },
+      { href: '/docs-new/introduction', label: 'Documentation' },
       { href: '#', label: 'API Reference' },
-      { href: '#', label: 'Examples Gallery' },
+      { href: '/gallery', label: 'Examples Gallery' },
       { href: '#', label: 'Tutorials' },
       { href: '#', label: 'Community' }
     ]
@@ -53,7 +52,7 @@ export const footerSections: FooterSection[] = [
   {
     title: 'Company',
     links: [
-      { href: '#', label: 'About' },
+      { href: '/about', label: 'About' },
       { href: '/blog', label: 'Blog' },
       { href: '#', label: 'Careers' },
       { href: '#', label: 'Contact' },
@@ -86,7 +85,7 @@ export const socialLinks: SocialLink[] = [
 ]
 
 export const legalLinks: NavigationItem[] = [
-  { href: '#', label: 'Privacy Policy' },
-  { href: '#', label: 'Terms of Service' },
-  { href: '#', label: 'Cookie Policy' }
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/cookies', label: 'Cookie Policy' }
 ]
