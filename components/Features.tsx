@@ -25,11 +25,38 @@ const Features = React.memo(() => {
     return () => document.removeEventListener('keydown', handleEscape)
   }, [showVideoModal])
 
+  // Reset video states when modal closes and handle body scroll
+  React.useEffect(() => {
+    if (!showVideoModal) {
+      setVideoLoading(false)
+      setVideoError(false)
+      // Re-enable body scroll
+      document.body.style.overflow = 'auto'
+    } else {
+      // Disable body scroll when modal is open
+      document.body.style.overflow = 'hidden'
+    }
+
+    // Cleanup function to ensure scroll is restored
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
+  }, [showVideoModal])
+
   const handleWatchVideo = useCallback((feature: typeof features[0]) => {
     setSelectedFeature(feature)
     setVideoLoading(true)
     setVideoError(false)
     setShowVideoModal(true)
+
+    // Fallback timeout to stop loading indicator after 5 seconds
+    const timeoutId = setTimeout(() => {
+      console.log('Video loading timeout reached')
+      setVideoLoading(false)
+    }, 5000)
+
+    // Store timeout ID for cleanup (though React will handle cleanup automatically)
+    return () => clearTimeout(timeoutId)
   }, [])
 
   const handleSetActiveFeature = useCallback((index: number) => {
@@ -45,11 +72,11 @@ const Features = React.memo(() => {
   const activeFeatureData = useMemo(() => features[activeFeature], [activeFeature])
 
   return (
-    <section id="features" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-white dark:bg-black overflow-hidden">
+    <section id="features" className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 bg-white dark:bg-black overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="text-center mb-20 scroll-mt-24">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-8">
             Powerful AI Use Cases
             <br />
             <span className="gradient-text">Get Started in Minutes</span>
@@ -207,32 +234,60 @@ const Features = React.memo(() => {
 
         {/* Video Modal */}
         {showVideoModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden">
+            <div
+            className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[99999] p-4 animate-fade-in"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowVideoModal(false)
+              }
+            }}
+          >
+            <div
+              className="bg-white dark:bg-gray-900 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl border-2 border-gray-300 dark:border-gray-600 transform animate-scale-in relative"
+              style={{ zIndex: 100000 }}
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {selectedFeature?.title} - Demo Video
                 </h3>
                 <button
                   onClick={() => setShowVideoModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Close video modal"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
-              <div className="p-4">
-                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative">
+              <div className="p-6">
+                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden relative border border-gray-200 dark:border-gray-700">
                   {selectedFeature?.videoUrl && !videoError ? (
                     <>
                       <video
+                        key={selectedFeature.videoUrl}
                         className="w-full h-full object-cover"
                         controls
                         muted
                         playsInline
                         preload="metadata"
-                        onLoadStart={() => setVideoLoading(true)}
-                        onCanPlay={() => setVideoLoading(false)}
-                        onLoadedData={() => setVideoLoading(false)}
+                        onLoadStart={() => {
+                          console.log('Video loading started')
+                          setVideoLoading(true)
+                        }}
+                        onCanPlay={() => {
+                          console.log('Video can play')
+                          setVideoLoading(false)
+                        }}
+                        onLoadedData={() => {
+                          console.log('Video data loaded')
+                          setVideoLoading(false)
+                        }}
+                        onLoadedMetadata={() => {
+                          console.log('Video metadata loaded')
+                          setVideoLoading(false)
+                        }}
                         onError={(e) => {
                           console.error('Video failed to load:', selectedFeature.videoUrl)
                           setVideoError(true)

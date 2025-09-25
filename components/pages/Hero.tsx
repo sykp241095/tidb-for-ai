@@ -113,7 +113,7 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
 
   return (
     <section className={cn(
-      "relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-black dark:to-gray-950 overflow-hidden",
+      "relative pt-32 pb-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-black dark:to-gray-950 overflow-hidden",
       className
     )}>
       {/* Animated Background Effects */}
