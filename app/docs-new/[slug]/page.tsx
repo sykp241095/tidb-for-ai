@@ -230,6 +230,7 @@ const DocsPage: React.FC<DocsPageProps> = async ({ params }) => {
                           href="/gallery"
                           className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                         >
+                          {/* eslint-disable-next-line jsx-a11y/alt-text */}
                           <Image size={14} />
                           Examples Gallery
                         </Link>
@@ -286,8 +287,9 @@ const DocsPage: React.FC<DocsPageProps> = async ({ params }) => {
                     <article className="prose prose-lg prose-gray dark:prose-invert max-w-none">
                       <ReactMarkdown
                         components={{
-                          code({ node, inline, className, children, ...props }) {
+                          code({ node, className, children, ...props }: any) {
                             const match = /language-(\w+)/.exec(className || '')
+                            const inline = !match
                             return !inline && match ? (
                               <div className="relative">
                                 <SyntaxHighlighter
