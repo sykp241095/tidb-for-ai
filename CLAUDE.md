@@ -48,6 +48,7 @@ npm run lint
 ### Data Layer
 - **Static Data**: Feature definitions, use cases, and navigation in `/data/`
 - **Type Safety**: Comprehensive TypeScript definitions in `/types/`
+- **Path Aliases**: `@/*` aliases configured in `tsconfig.json` for clean imports
 - **Constants**: Application-wide constants in `/lib/constants/`
 
 ### Styling & Assets
@@ -104,7 +105,7 @@ NEXT_PUBLIC_SITE_URL=https://tidbcloud.com  # For metadata base URL
 - Maintain consistent code example formatting
 
 ### Documentation
-- Markdown files in `/docs/` directory
+- Markdown files in `/docs/` directory (rendered via `docs-new/[slug]` route)
 - Use consistent heading structure
 - Include code examples where applicable
 - Cross-reference with blog content when relevant
