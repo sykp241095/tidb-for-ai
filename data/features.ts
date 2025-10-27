@@ -1,4 +1,4 @@
-import { Search, Image, Layers, Sparkles, Zap, Shield } from 'lucide-react'
+import { Search, Image, Layers, Sparkles, Zap, Shield, Activity } from 'lucide-react'
 import { Feature, AdditionalFeature } from '@/types'
 
 export const features: Feature[] = [
@@ -134,6 +134,49 @@ table.bulk_insert([
     Chunk(text="PyTiDB is a Python library for developers to connect to TiDB."),
     Chunk(text="LlamaIndex is a Python library for building AI-powered applications."),
 ])`
+  },
+  {
+    icon: Activity,
+    title: 'Vector Search with Realtime Data',
+    description: 'Live recommendations with auto-embedding updates.',
+    details: [
+      'Real-time data updates and re-indexing',
+      'Auto-embedding for live product recommendations',
+      'Dynamic similarity scoring with distance thresholds',
+      'Interactive admin panel for data management'
+    ],
+    color: 'from-orange-500 to-orange-600',
+    videoUrl: '/videos/realtime-vector-search.mp4',
+    codeUrl: 'https://github.com/pingcap/pytidb/tree/main/examples/realtime_vector_search',
+    code: `class Product(TableModel):
+    __tablename__ = "products"
+
+    id: int = Field(primary_key=True)
+    name: str = Field(sa_type=TEXT)
+    description: str = Field(sa_type=TEXT)
+    description_vec: list[float] = embed_func.VectorField(
+        source_field="description"
+    )
+    category: str = Field(sa_type=TEXT)
+    price: float = Field()
+
+table = db.create_table(schema=Product, if_exists="overwrite")
+
+# App-1 is inserting strings and vectors are auto-generated in real-time
+table.insert(Product(
+    name="Professional Basketball",
+    description="High-quality basketball for professional and amateur players",
+    category="Sports",
+    price=29.99
+))
+
+# App-2 is searching at once using semantic similarity with user preferences
+recommendations = (
+    table.search(user_profile)
+    .distance_threshold(distance_threshold)
+    .limit(5)
+    .to_list()
+)`
   }
 ]
 
