@@ -7,10 +7,6 @@ export const navigationItems: NavigationItem[] = [
     label: 'What is TiDB'
   },
   {
-    href: '/unified-data-infrastructure',
-    label: 'Unified Data Infrastructure'
-  },
-  {
     href: '/#features',
     label: 'Features'
   },
